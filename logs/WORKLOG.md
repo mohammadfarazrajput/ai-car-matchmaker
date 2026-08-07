@@ -89,3 +89,32 @@ cancel downstream STRETCH work rather than compressing it.
 T058 ("read `examples/basic-host` first") deliberately precedes T059 (`McpAppHost`, 2h timebox),
 and T061 is the pre-agreed cloudflared/Claude-connector fallback — so the fallback is a decision
 already made rather than an improvisation under pressure.
+
+**Agent B (opencode) — Phase 1 scaffold.** Created `frontend/` tree: T007 (package.json, all deps
+exact-pinned — no caret/tilde), T009 (ESLint 10 flat config + Prettier 3.9.6), T025 (Next.js 16.3.0
++ CopilotKit provider). Dependencies: `@copilotkit/a2ui-renderer`, `react-core`, `react-ui` all at
+1.66.2 (matching family); React 19.2.8; TypeScript 7.0.2. Versions verified against npm registry.
+Lockfile pending — Node.js/npm not available in this env; must run `npm install` before first build.
+Note from Agent A: canary tags exist on `@copilotkit/a2ui-renderer` — all pins must be exact 1.66.2.
+→ commit `dbf1ba8`
+
+**T005 / T006 / T013 (backend).** Package tree created; `requirements.txt` written with exact pins;
+resolution verified by real install into a scratch venv (118 packages).
+
+Principle V earned its keep. Of the versions I wrote from memory, **five were wrong** — `httpx
+0.29.1` and `pytest 9.1.2` do not exist at all. A real resolve then found a genuine conflict:
+`deepagents 0.7.5` requires `langchain-core>=1.5.0`, so the whole LangChain family moved to
+`langchain 1.3.14` / `langchain-core 1.5.3` / `langgraph 1.2.10` / `langgraph-checkpoint 4.2.0`.
+
+**Bigger finding: `mcp==2.0.0` has no `FastMCP`.** The official `qr-server` example we planned
+against targets 1.x. 2.0.0 instead ships **first-class MCP Apps** as `mcp.server.apps.Apps`, an
+`Extension` passed to `MCPServer(extensions=[apps])`, with `APP_MIME_TYPE ==
+"text/html;profile=mcp-app"` and `_meta.ui.*` emitted by the SDK rather than hand-written.
+Better than the plan — less to get wrong on a NON-NEGOTIABLE principle.
+
+Also surfaced a requirement we did not have: SEP-2133 graceful degradation. `client_supports_apps(ctx)`
+lets a UI-bound tool return usable text to hosts that never negotiated the Apps capability. Added to
+the contract — it is what keeps the T061 fallback honest.
+
+**The wire contract did not change**, so Agent B is unaffected and no cross-agent coordination was
+needed.
