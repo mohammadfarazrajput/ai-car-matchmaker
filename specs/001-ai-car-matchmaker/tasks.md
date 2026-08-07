@@ -38,7 +38,7 @@ Zero build cost, days of waiting. Start in parallel with Phase 1.
 
 ## Phase 1: Setup — Day 1 block 1
 
-- [ ] T005 SHIP Create `backend/` and `frontend/` trees per plan.md Structure Decision
+- [x] T005 SHIP Create `backend/` tree per plan.md Structure Decision (`frontend/` left to T025 — opencode owns it)
 - [ ] T006 SHIP Write `backend/requirements.txt` with exact pins from research.md R9 — no ranges
 - [ ] T007 SHIP Write `frontend/package.json` with exact pins; commit the lockfile
 - [ ] T008 [P] SHIP Configure ruff + black in `backend/pyproject.toml`
