@@ -136,7 +136,7 @@ with visible breakdowns; network tab shows real A2UI frames.
 
 **🚦 CHECKPOINT D2-MID.** Both MCP Apps render in-chat and round-trip booking state.
 
-- [ ] T061 [US3] SHIP **Fallback, fires only if T059 exceeds its timebox**: expose `/mcp` via `npx cloudflared tunnel --url http://localhost:8000`, add as a Claude custom connector, verify both apps render there, and record the substitution in `logs/DECISIONS.md`
+- [ ] T061 [US3] SHIP **Fallback, fires only if T059 exceeds its timebox**: expose `/mcp` via `npx cloudflared tunnel --url http://localhost:8010`, add as a Claude custom connector, verify both apps render there, and record the substitution in `logs/DECISIONS.md`
 
 ---
 

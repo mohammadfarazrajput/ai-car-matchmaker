@@ -2,7 +2,7 @@
 
 **Governs**: FR-021, FR-023, FR-029 · Backend surface consumed by the frontend
 
-Base: `http://localhost:8000`
+Base: `http://localhost:8010`
 
 ---
 

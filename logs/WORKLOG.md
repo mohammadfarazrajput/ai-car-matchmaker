@@ -118,3 +118,40 @@ the contract — it is what keeps the T061 fallback honest.
 
 **The wire contract did not change**, so Agent B is unaffected and no cross-agent coordination was
 needed.
+
+**Agent B (opencode) — Phase 3: A2UI renderer + ChatPanel.** T031: built the A2UI v1.0 type
+system (`types.ts`), surface state store (`store.ts`), and React renderer (`renderer.tsx`) covering
+all basic catalog components — Text, Image, Icon, Row, Column, List, Card, Button, TextField,
+ChoicePicker, Slider, DateTimeInput, Divider. T032: AG-UI SSE stream parser (`ag-ui-stream.ts`)
+consuming `POST /agent` events, A2UIProvider context, and `ChatPanel.tsx` wiring the stream to
+rendered surfaces. Replaced the CopilotKit sidebar with the direct AG-UI approach mandated by the
+contracts. CopilotKit packages remain in package.json for potential future use. Layout and page
+updated to use A2UIProvider + ChatPanel. Commit `8722fc3`.
+→ commits `dbf1ba8`, `8722fc3`
+
+**Agent B (opencode) — Phase 5-8: remaining frontend tasks.** T071: NotificationPanel.tsx displaying
+rendered notification content (email HTML, Slack blocks, SMS text) with mock/live/failed status badges
+per channel. T075: session resume route at `src/app/s/[code]/page.tsx` — follows redirect from
+`GET /s/{code}`, or shows 410 with the error message and a "start fresh" button per FR-023. T079:
+multi-stage Dockerfile with `NEXT_PUBLIC_*` as build args (not runtime env), standalone output mode,
+node:22-alpine base. Commit `07b656f`.
+
+All assigned tasks complete except T059 (McpAppHost), held for pairing with Agent A.
+→ commits `dbf1ba8`, `8722fc3`, `07b656f`
+
+**Contract stub live (T010, T022, T024 + the A2UI emitter from T029).**
+`backend/app/{config,main,stub_data}.py` and `backend/app/a2ui/{emitter,surfaces}.py`.
+Verified end to end: 61 A2UI frames over SSE, every one valid, single-line, and free of the
+fabricated `protocol`/`RENDER_COMPONENT`/`props` shape. `/health` reports all channels `mock`,
+which is the zero-key state working as designed.
+
+**Port moved 8000 → 8010.** Port 8000 on this machine is already held by another service (an
+Express app, not ours). Left it alone; changed our port instead and propagated through
+`contracts/agent-api.md`, `.env.example`, `quickstart.md` and `tasks.md`.
+
+The emitter validates on the way out rather than trusting callers — `to_jsonl` refuses a frame
+carrying a `props` object or a top-level `protocol` key. Protocol fidelity is NON-NEGOTIABLE, so it
+is enforced in code rather than in review.
+
+Stub data deliberately ranks a Tesla above the BMW. A stub that rehearsed a BMW-first result would
+set the wrong expectation for a ranker that is required to be brand-neutral.

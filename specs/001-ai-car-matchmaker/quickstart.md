@@ -104,7 +104,7 @@ listing carrying a non-empty availability window, and the dataset manifest decla
 Verify the wire contract directly:
 
 ```bash
-curl -s -X POST localhost:8000/mcp \
+curl -s -X POST localhost:8010/mcp \
   -H 'Content-Type: application/json' \
   -d '{"jsonrpc":"2.0","id":1,"method":"resources/read",
        "params":{"uri":"ui://car-matchmaker/booking-form.html"}}' | jq '.result.contents[0].mimeType'
@@ -119,7 +119,7 @@ docker compose exec backend pytest tests/contract/test_mcp_apps.py -v
 Claude custom connector:
 
 ```bash
-npx cloudflared tunnel --url http://localhost:8000
+npx cloudflared tunnel --url http://localhost:8010
 ```
 
 ---
@@ -163,7 +163,7 @@ docker compose exec backend pytest tests/contract/test_dispatcher.py -v   # idem
 **Proves**: US6, SC-007, FR-023
 
 ```bash
-curl -s -X POST localhost:8000/api/session/{id}/resume-token | jq -r .url
+curl -s -X POST localhost:8010/api/session/{id}/resume-token | jq -r .url
 ```
 
 Open in a private window → every input and result restored, no re-asking. Open the same link again →
@@ -188,7 +188,7 @@ docker compose exec backend pytest tests/integration/ -v
 cd backend && python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 python -m app.data.generate            # regenerate listings.json
-uvicorn app.main:app --reload --port 8000
+uvicorn app.main:app --reload --port 8010
 
 # MCP App views (rebuild after editing)
 cd backend/app/mcp/views && npm install && npm run build
