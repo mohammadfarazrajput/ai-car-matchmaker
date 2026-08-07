@@ -70,3 +70,13 @@ It supersedes `docs/`, `gemini/` and `claudedocs/` where they conflict.
 Zero `[NEEDS CLARIFICATION]` markers: every gap had a defensible default, recorded in Assumptions
 instead of deferred as a question. Quality checklist passed on the second iteration — see
 `checklists/requirements.md` for the three issues corrected.
+
+**Ran `/speckit-plan`** — `specs/001-ai-car-matchmaker/`: plan.md, research.md (10 findings),
+data-model.md (7 entities), quickstart.md (10 validation scenarios), and 4 contracts
+(mcp-apps, a2ui-surfaces, agent-api, channel-adapter). Constitution gate PASS both pre-Phase 0
+and post-Phase 1; Complexity Tracking omitted as unused.
+
+Design decision worth recording: the ranking scorer is handed a `ScorableListing` projection that
+omits `make`, `model` and `provider.name`. Brand neutrality becomes structural rather than a matter
+of discipline — the scorer cannot favour a manufacturer because it cannot see one. SC-006's masking
+test then guards the projection against regression.
