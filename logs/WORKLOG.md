@@ -58,3 +58,9 @@ Med Risk at install; Socket clean.
 contains no `resourceUri`, `_meta`, `ui://`, `text/html;profile=mcp-app` or postMessage; it
 documents mcp-use v2's own runtime bridge. Decision #2 (Python `FastMCP`) stands; skill is idle.
 → decision #20
+
+**Ratified the constitution** — `.specify/memory/constitution.md` v1.0.0. Six principles:
+Protocol Fidelity (non-negotiable), Zero-Key Demo, Honest Ranking (non-negotiable), Truthful
+Artifacts, Reproducible Builds, Scope Discipline. Template shipped 5 principle slots; added a
+sixth following the same pattern. No placeholders left, no extension hooks registered.
+It supersedes `docs/`, `gemini/` and `claudedocs/` where they conflict.

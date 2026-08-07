@@ -25,6 +25,7 @@ is reversed, add a new row pointing back at the old one.
 | 18 | 08-08 | Docker, README, deck, video are **not stretch** | Claude | A missing deck costs more marks than missing voice |
 | 19 | 08-08 | spec-kit initialised (`--integration claude`) | Faraz | Brief requires spec-driven development. Flag is `--integration`, not `--ai`; needed `--ignore-agent-tools` since the `claude` binary isn't on PATH in this shell |
 | 20 | 08-08 | `mcp-apps-builder` skill installed but **unused**; Python MCP servers confirmed (upholds #2) | Claude, delegated by Faraz | Skill is TypeScript/mcp-use v2 only. Its `references/views.md` has zero spec markers — no `resourceUri`, `_meta`, `ui://`, `text/html;profile=mcp-app` or postMessage — so it teaches mcp-use's proprietary runtime, not the official contract our host must implement. Brief's Resources name the MCP Python SDK; harness and backend are already Python. Host reference remains `examples/basic-host` in modelcontextprotocol/ext-apps. Note: Snyk rated the skill Med Risk at install |
+| 21 | 08-08 | **Constitution v1.0.0 ratified** — 6 principles; supersedes `docs/`, `gemini/`, `claudedocs/` on conflict | Claude, delegated by Faraz | Encodes the standing rules as binding gates so specs are checked before implementation. Protocol Fidelity and Honest Ranking marked NON-NEGOTIABLE — strengthenable, not weakenable, during the build |
 
 ---
 
