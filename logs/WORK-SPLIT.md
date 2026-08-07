@@ -13,7 +13,6 @@ line in this project with near-zero conflict surface.
 |---|---|---|
 | Owns | `backend/**` | `frontend/**` |
 | Language | Python | TypeScript |
-| Branch | `feat/backend` | `feat/frontend` |
 | Tasks | T005–T006, T008, T010, T012–T024, T026–T030, T033–T046, T047–T057, T060–T070, T072–T074, T076–T078 | T007, T009, T025, T031–T032, T059, T071, T075, T079 |
 
 **Neither agent edits the other's directory. Ever.** If you need something across the boundary, the
@@ -34,23 +33,45 @@ contract already specifies it — build to the contract, do not reach across.
 
 ## 2. Git protocol
 
-```bash
-# Both, once
-git checkout main && git pull
-git checkout -b feat/backend      # or feat/frontend
+**Both agents share ONE working tree at `/mnt/data/bmw`.** There are no separate clones and no
+separate branches — a working tree has exactly one HEAD, so two branches is not physically possible
+here. Everything below follows from that.
 
-# Before every commit
-git fetch origin && git rebase origin/main
+### Forbidden — these mutate shared state and will destroy the other agent's in-flight work
 
-# Merge to main at checkpoints only — never mid-phase
+```
+git checkout <branch>    git switch    git rebase    git stash
+git reset --hard         git clean     git merge     git pull
 ```
 
-- **Commit small and often.** A 20-file commit is unmergeable in parallel work.
-- **Never push to `main` directly.** Merge via the checkpoint sync in §5.
-- **Never `git add -A` from the repo root** — it will sweep the other agent's files. Stage your own
-  directory explicitly: `git add backend/` or `git add frontend/`.
-- A rebase conflict outside your directory means the split was violated. Stop and reconcile rather
-  than resolving it.
+If you think you need one of these, **stop and say so.** Do not run it.
+
+### Committing — always with an explicit pathspec
+
+```bash
+# Agent A                                 # Agent B
+git commit -m "msg" -- backend/           git commit -m "msg" -- frontend/
+```
+
+The trailing `-- <dir>` is **not optional**. A bare `git commit` commits whatever happens to be
+staged — including the other agent's files if they staged a moment earlier. The pathspec form
+ignores the index and commits only those paths, which makes concurrent commits safe.
+
+Never `git add -A`. Prefer skipping `git add` entirely: the pathspec form of `git commit` picks up
+unstaged changes in those paths on its own.
+
+### Other rules
+
+- **Commit small and often.** Long-lived uncommitted work is what gets lost.
+- Both agents commit to the **same branch** (`main`). This is safe *only* because the directory
+  ownership in §1 is absolute.
+- `git status` will show the other agent's files as modified. **That is normal.** Leave them alone.
+- Pushing is Agent A's job, on Faraz's approval, and only when both agents are at rest.
+
+> If you would rather have real branches, the correct tool is
+> `git worktree add ../bmw-frontend -b feat/frontend`, which gives Agent B its own directory and
+> HEAD. That requires repointing opencode at the new path — worth it for a longer project, probably
+> not for a two-day one.
 
 ---
 
@@ -98,13 +119,14 @@ does not change.
 | When | What |
 |---|---|
 | After A's stub is live | B starts frontend work in earnest |
-| End of Phase 3 (US1) | Both merge to `main`, run the interview end to end |
-| **CHECKPOINT D1** | Full merge. Interview + ranking working in the browser |
+| End of Phase 3 (US1) | Both commit, run the interview end to end |
+| **CHECKPOINT D1** | Interview + ranking working in the browser |
 | Before T059 (`McpAppHost`) | **Pair on this** — see §6 |
-| **CHECKPOINT D2-MID** | Full merge. Both MCP Apps rendering in-chat |
-| Before T081 | Merge everything, verify the zero-key run from a clean clone |
+| **CHECKPOINT D2-MID** | Both MCP Apps rendering in-chat |
+| Before T081 | Verify the zero-key run from a clean clone |
 
-At each sync: both rebase on `main`, merge, run the full test suite, fix together.
+There is no merging — one working tree, one branch. A sync point simply means both agents stop, commit
+their own directory, and run the full test suite together before continuing.
 
 ---
 
@@ -150,8 +172,9 @@ Paste this to start Agent B:
 > `specs/001-ai-car-matchmaker/contracts/`.
 >
 > **You own `frontend/` only.** Never edit `backend/`, `specs/`, `claudedocs/`, `.specify/` or any
-> shared file listed in §1. Work on branch `feat/frontend`. Stage with `git add frontend/`, never
-> `git add -A`.
+> shared file listed in §1. We share one working tree, so commit with
+> `git commit -m "msg" -- frontend/` — the pathspec is mandatory. Never run `git add -A`,
+> `git checkout`, `git rebase`, `git stash` or `git pull`.
 >
 > **Your tasks**: T007, T009, T025, T031, T032, T071, T075, T079. Hold T059 until we pair on it.
 >
