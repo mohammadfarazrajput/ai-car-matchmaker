@@ -1,0 +1,310 @@
+"use client";
+
+import React from "react";
+import {
+  A2UIComponent,
+  DynamicValue,
+  Action,
+  TextComponent,
+  ImageComponent,
+  RowComponent,
+  ColumnComponent,
+  ListComponent,
+  CardComponent,
+  ButtonComponent,
+  TextFieldComponent,
+  ChoicePickerComponent,
+  DividerComponent,
+} from "./types";
+import { SurfaceState } from "./store";
+
+function resolveValue(v: DynamicValue | undefined, dataModel: Record<string, unknown>): string {
+  if (v === undefined || v === null) return "";
+  if (typeof v === "string") return v;
+  if (typeof v === "number" || typeof v === "boolean") return String(v);
+  if (typeof v === "object" && "path" in v) {
+    const parts = (v as { path: string }).path.split("/").filter(Boolean);
+    let current: any = dataModel;
+    for (const p of parts) {
+      if (current == null) return "";
+      current = current[p];
+    }
+    return current != null ? String(current) : "";
+  }
+  if (typeof v === "object" && "call" in v) {
+    const fn = v as { call: string; args: Record<string, unknown> };
+    if (fn.call === "formatString" && fn.args.value) {
+      const template = resolveValue(fn.args.value as DynamicValue, dataModel);
+      return template.replace(/\$\{([^}]+)\}/g, (_match, expr: string) => {
+        const trimmed = expr.trim();
+        if (trimmed.startsWith("/")) {
+          return resolveValue({ path: trimmed }, dataModel);
+        }
+        return resolveValue({ path: trimmed }, dataModel);
+      });
+    }
+    return `[${fn.call}]`;
+  }
+  return String(v);
+}
+
+function resolveChildren(
+  children: string[] | { path: string; componentId: string } | undefined,
+  dataModel: Record<string, unknown>,
+): string[] {
+  if (!children) return [];
+  if (Array.isArray(children)) return children;
+  const items = resolveValue({ path: children.path }, dataModel);
+  try {
+    const arr = JSON.parse(items);
+    if (Array.isArray(arr)) {
+      return arr.map((_: unknown, i: number) => `${children.componentId}-${i}`);
+    }
+  } catch {
+    // fall through
+  }
+  return [];
+}
+
+function renderComponent(
+  comp: A2UIComponent,
+  surface: SurfaceState,
+  onAction?: (action: Action) => void,
+): React.ReactNode {
+  const { dataModel } = surface;
+
+  switch (comp.component) {
+    case "Text": {
+      const c = comp as TextComponent;
+      return (
+        <span key={c.id} style={{ fontSize: c.variant === "caption" ? "0.8rem" : "1rem" }}>
+          {resolveValue(c.text, dataModel)}
+        </span>
+      );
+    }
+
+    case "Image": {
+      const c = comp as ImageComponent;
+      const src = resolveValue(c.url, dataModel);
+      const alt = resolveValue(c.description, dataModel);
+      return <img key={c.id} src={src} alt={alt} style={{ maxWidth: "100%", borderRadius: 4 }} />;
+    }
+
+    case "Icon": {
+      const c = comp as ImageComponent;
+      return <span key={c.id} aria-label={String(c.name)}>●</span>;
+    }
+
+    case "Row": {
+      const c = comp as RowComponent;
+      const childIds = resolveChildren(c.children, dataModel);
+      return (
+        <div
+          key={c.id}
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            gap: "0.5rem",
+            justifyContent: c.justify ?? "start",
+            alignItems: c.align ?? "stretch",
+          }}
+        >
+          {childIds.map((childId) => {
+            const childComp = surface.components.get(childId);
+            return childComp ? (
+              <React.Fragment key={childId}>{renderComponent(childComp, surface, onAction)}</React.Fragment>
+            ) : null;
+          })}
+        </div>
+      );
+    }
+
+    case "Column": {
+      const c = comp as ColumnComponent;
+      const childIds = resolveChildren(c.children, dataModel);
+      return (
+        <div
+          key={c.id}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.5rem",
+            justifyContent: c.justify ?? "start",
+            alignItems: c.align ?? "stretch",
+          }}
+        >
+          {childIds.map((childId) => {
+            const childComp = surface.components.get(childId);
+            return childComp ? (
+              <React.Fragment key={childId}>{renderComponent(childComp, surface, onAction)}</React.Fragment>
+            ) : null;
+          })}
+        </div>
+      );
+    }
+
+    case "List": {
+      const c = comp as ListComponent;
+      const childIds = resolveChildren(c.children, dataModel);
+      const isHorizontal = c.direction === "horizontal";
+      return (
+        <div
+          key={c.id}
+          style={{
+            display: "flex",
+            flexDirection: isHorizontal ? "row" : "column",
+            gap: "0.5rem",
+            overflowX: isHorizontal ? "auto" : undefined,
+          }}
+        >
+          {childIds.map((childId) => {
+            const childComp = surface.components.get(childId);
+            return childComp ? (
+              <React.Fragment key={childId}>{renderComponent(childComp, surface, onAction)}</React.Fragment>
+            ) : null;
+          })}
+        </div>
+      );
+    }
+
+    case "Card": {
+      const c = comp as CardComponent;
+      const childComp = surface.components.get(c.child);
+      return (
+        <div
+          key={c.id}
+          style={{
+            border: "1px solid #e0e0e0",
+            borderRadius: 8,
+            padding: "1rem",
+            background: "#fff",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+          }}
+        >
+          {childComp ? renderComponent(childComp, surface, onAction) : null}
+        </div>
+      );
+    }
+
+    case "Button": {
+      const c = comp as ButtonComponent;
+      const childComp = surface.components.get(c.child);
+      const label = childComp && childComp.component === "Text"
+        ? resolveValue((childComp as TextComponent).text, dataModel)
+        : "Button";
+      return (
+        <button
+          key={c.id}
+          onClick={() => c.action && onAction?.(c.action)}
+          style={{
+            padding: "0.5rem 1rem",
+            borderRadius: 6,
+            border: c.variant === "primary" ? "none" : "1px solid #ccc",
+            background: c.variant === "primary" ? "#1a1a1a" : c.variant === "borderless" ? "transparent" : "#f5f5f5",
+            color: c.variant === "primary" ? "#fff" : "#1a1a1a",
+            cursor: "pointer",
+            fontWeight: c.variant === "primary" ? 600 : 400,
+          }}
+        >
+          {label}
+        </button>
+      );
+    }
+
+    case "TextField": {
+      const c = comp as TextFieldComponent;
+      return (
+        <div key={c.id} style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+          <label style={{ fontSize: "0.85rem", fontWeight: 500 }}>{resolveValue(c.label, dataModel)}</label>
+          <input
+            type={c.variant === "number" ? "number" : c.variant === "obscured" ? "password" : "text"}
+            placeholder={resolveValue(c.placeholder, dataModel)}
+            defaultValue={resolveValue(c.value, dataModel)}
+            style={{
+              padding: "0.5rem",
+              borderRadius: 4,
+              border: "1px solid #ccc",
+              fontSize: "0.9rem",
+            }}
+          />
+        </div>
+      );
+    }
+
+    case "ChoicePicker": {
+      const c = comp as ChoicePickerComponent;
+      return (
+        <div key={c.id} style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+          {c.label && <label style={{ fontSize: "0.85rem", fontWeight: 500 }}>{resolveValue(c.label, dataModel)}</label>}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+            {c.options.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => c.action && onAction?.(c.action)}
+                style={{
+                  padding: "0.4rem 0.8rem",
+                  borderRadius: 20,
+                  border: "1px solid #ccc",
+                  background: "#f5f5f5",
+                  cursor: "pointer",
+                  fontSize: "0.85rem",
+                }}
+              >
+                {resolveValue(opt.label, dataModel)}
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    case "Slider": {
+      const c = comp as ChoicePickerComponent;
+      return (
+        <div key={c.id} style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+          {c.label && <label style={{ fontSize: "0.85rem", fontWeight: 500 }}>{resolveValue(c.label, dataModel)}</label>}
+          <input type="range" style={{ width: "100%" }} />
+        </div>
+      );
+    }
+
+    case "DateTimeInput": {
+      const c = comp as TextFieldComponent;
+      return (
+        <div key={c.id} style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+          {c.label && <label style={{ fontSize: "0.85rem", fontWeight: 500 }}>{resolveValue(c.label, dataModel)}</label>}
+          <input type="date" style={{ padding: "0.5rem", borderRadius: 4, border: "1px solid #ccc" }} />
+        </div>
+      );
+    }
+
+    case "Divider": {
+      return <hr key={comp.id} style={{ border: "none", borderTop: "1px solid #e0e0e0", margin: "0.5rem 0" }} />;
+    }
+
+    default:
+      return (
+        <div key={comp.id} style={{ padding: "0.25rem", color: "#999", fontSize: "0.8rem" }}>
+          [{comp.component}]
+        </div>
+      );
+  }
+}
+
+export function SurfaceRenderer({
+  surface,
+  onAction,
+}: {
+  surface: SurfaceState;
+  onAction?: (action: Action) => void;
+}) {
+  const root = surface.components.get("root");
+  if (!root) {
+    const first = Array.from(surface.components.values())[0];
+    if (!first) return null;
+    return <>{renderComponent(first, surface, onAction)}</>;
+  }
+  return <>{renderComponent(root, surface, onAction)}</>;
+}
+
+export { resolveValue };

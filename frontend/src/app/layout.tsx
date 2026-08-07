@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { CopilotKitProvider } from "@/components/CopilotKitProvider";
+import { A2UIProvider } from "@/lib/a2ui/a2ui-provider";
 
 export const metadata: Metadata = {
   title: "AI Car Matchmaker",
@@ -11,7 +11,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <CopilotKitProvider>{children}</CopilotKitProvider>
+        <A2UIProvider>{children}</A2UIProvider>
       </body>
     </html>
   );
