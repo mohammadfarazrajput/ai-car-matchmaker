@@ -80,3 +80,12 @@ Design decision worth recording: the ranking scorer is handed a `ScorableListing
 omits `make`, `model` and `provider.name`. Brand neutrality becomes structural rather than a matter
 of discipline — the scorer cannot favour a manufacturer because it cannot see one. SC-006's masking
 test then guards the projection against regression.
+
+**Ran `/speckit-tasks`** — `specs/001-ai-car-matchmaker/tasks.md`, 95 tasks across 12 phases.
+90 SHIP, 5 STRETCH; 4 DESIGNED items listed with no implementation task so they cannot drift into
+being demonstrated. 20 parallelisable. Two hard checkpoints (D1, D2-MID) written in as gates that
+cancel downstream STRETCH work rather than compressing it.
+
+T058 ("read `examples/basic-host` first") deliberately precedes T059 (`McpAppHost`, 2h timebox),
+and T061 is the pre-agreed cloudflared/Claude-connector fallback — so the fallback is a decision
+already made rather than an improvisation under pressure.
