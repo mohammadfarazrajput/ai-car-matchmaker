@@ -1,0 +1,46 @@
+# Work Log
+
+Newest last. One entry per unit of work.
+
+---
+
+## 2026-08-08
+
+**Read the existing docs.** 5 files in `docs/`, 1,783 lines. Specification only — no code, no git repo.
+
+**Verified dependencies against PyPI/npm.** Found two pins that cannot install:
+`ag-ui-langgraph>=0.1.0` (latest 0.0.42) and `copilotkit>=1.61.0` (PyPI is 0.1.94).
+`deepgram-sdk` is at 7.6.0 while all code samples target the removed v3 API.
+
+**Wrote `docs/PLAN.md`.** First plan revision. Flagged the missing MCP Apps host, the
+listing schema's inability to match a target date, and the undefined ranking algorithm.
+
+**Created the git repo.** `git init -b main` in `/mnt/data/bmw`. Needed
+`git config --global --add safe.directory /mnt/data/bmw` — the mount is root-owned, uid is 1000.
+Moved `docs/README.md` to repo root so its links resolve. Added `.gitignore` and `.env.example`.
+→ commit `ec7f6f9`
+
+**Added LICENSE, fixed placeholder URLs.** README claimed MIT with no LICENSE file.
+Replaced `your-username` in both clone commands.
+→ commit `80ef88f`
+
+**GitHub setup.** Repo created by Faraz, empty and public — no auto-init commit, so the push was
+clean. Added remote, pushed, set 11 topics. Description and MIT license detected.
+→ https://github.com/mohammadfarazrajput/ai-car-matchmaker
+
+**Verified free-tier reality** (searches, not memory). SendGrid free plan retired 2025-05-27.
+Twilio A2P 10DLC needs a paid account, $44 + $15/campaign, 10–15 day review — trial accounts
+cannot register at all. WhatsApp needs multi-day Meta Business Verification. Deepgram and Slack
+are genuinely free.
+
+**Verified the real A2UI wire format.** Gemini's drafts specify a fabricated payload
+(`"protocol": "A2UI/1.0"`, `"action": "RENDER_COMPONENT"`). Real A2UI is JSONL carrying exactly
+one of `createSurface` / `updateComponents` / `updateDataModel` / `deleteSurface`.
+
+**Wrote `claudedocs/` — 9 documents, 1,283 lines.** Final plan. Core design: one
+transport-agnostic match core with thin channel adapters, cross-channel session resume, shared
+notification dispatcher. Scope tiered SHIP / STRETCH / DESIGNED.
+→ commit `6505c7b`, pushed
+
+**Feedback from Faraz:** work in smaller confirmable steps, ask before each; maintain log files.
+Created `logs/WORKLOG.md` and `logs/DECISIONS.md`. Saved to memory.
