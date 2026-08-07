@@ -57,8 +57,16 @@ The trailing `-- <dir>` is **not optional**. A bare `git commit` commits whateve
 staged — including the other agent's files if they staged a moment earlier. The pathspec form
 ignores the index and commits only those paths, which makes concurrent commits safe.
 
-Never `git add -A`. Prefer skipping `git add` entirely: the pathspec form of `git commit` picks up
-unstaged changes in those paths on its own.
+**New (untracked) files must be `git add`ed first** — a pathspec commit only sees files git already
+tracks, and fails with `did not match any file(s) known to git` otherwise. So for anything new:
+
+```bash
+git add frontend/                          # scoped to YOUR directory only
+git commit -m "msg" -- frontend/
+```
+
+`git add <your-dir>` is safe. `git add -A` and `git add .` from the repo root are not — they sweep
+the other agent's files into your index.
 
 ### Other rules
 
@@ -172,9 +180,9 @@ Paste this to start Agent B:
 > `specs/001-ai-car-matchmaker/contracts/`.
 >
 > **You own `frontend/` only.** Never edit `backend/`, `specs/`, `claudedocs/`, `.specify/` or any
-> shared file listed in §1. We share one working tree, so commit with
-> `git commit -m "msg" -- frontend/` — the pathspec is mandatory. Never run `git add -A`,
-> `git checkout`, `git rebase`, `git stash` or `git pull`.
+> shared file listed in §1. We share one working tree, so stage and commit scoped to your directory
+> only — `git add frontend/` then `git commit -m "msg" -- frontend/`. Both parts are mandatory.
+> Never run `git add -A`, `git add .`, `git checkout`, `git rebase`, `git stash` or `git pull`.
 >
 > **Your tasks**: T007, T009, T025, T031, T032, T071, T075, T079. Hold T059 until we pair on it.
 >
