@@ -52,7 +52,7 @@ A multistep AI agent that helps users find the right car to rent or buy through 
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/your-username/ai-car-matchmaker.git
+git clone https://github.com/mohammadfarazrajput/ai-car-matchmaker.git
 cd ai-car-matchmaker
 ```
 
