@@ -64,3 +64,9 @@ Protocol Fidelity (non-negotiable), Zero-Key Demo, Honest Ranking (non-negotiabl
 Artifacts, Reproducible Builds, Scope Discipline. Template shipped 5 principle slots; added a
 sixth following the same pattern. No placeholders left, no extension hooks registered.
 It supersedes `docs/`, `gemini/` and `claudedocs/` where they conflict.
+
+**Wrote the baseline spec** — `specs/001-ai-car-matchmaker/spec.md`. 7 prioritised user stories,
+31 functional requirements, 5 mandated constraints, 12 success criteria, 6 key entities.
+Zero `[NEEDS CLARIFICATION]` markers: every gap had a defensible default, recorded in Assumptions
+instead of deferred as a question. Quality checklist passed on the second iteration — see
+`checklists/requirements.md` for the three issues corrected.
