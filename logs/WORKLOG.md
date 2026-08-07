@@ -44,3 +44,17 @@ notification dispatcher. Scope tiered SHIP / STRETCH / DESIGNED.
 
 **Feedback from Faraz:** work in smaller confirmable steps, ask before each; maintain log files.
 Created `logs/WORKLOG.md` and `logs/DECISIONS.md`. Saved to memory.
+
+**Installed spec-kit.** `specify init --here --integration claude --force --ignore-agent-tools`.
+The `--ai` flag from the docs no longer exists; it is `--integration`. Agent detection also fails
+because the `claude` binary isn't on PATH in this shell, hence `--ignore-agent-tools`.
+Added `.specify/` and 10 `speckit-*` skills under `.claude/skills/`.
+
+**Installed the `mcp-apps-builder` skill** (`npx skills add mcp-use/mcp-use`). Landed in
+`.agents/skills/`, symlinked into `.claude/skills/`, plus `skills-lock.json`. Snyk rated it
+Med Risk at install; Socket clean.
+
+**Checked the skill against the MCP Apps spec — it does not align.** `references/views.md`
+contains no `resourceUri`, `_meta`, `ui://`, `text/html;profile=mcp-app` or postMessage; it
+documents mcp-use v2's own runtime bridge. Decision #2 (Python `FastMCP`) stands; skill is idle.
+→ decision #20
