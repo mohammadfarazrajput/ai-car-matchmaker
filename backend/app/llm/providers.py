@@ -60,6 +60,20 @@ class EchoChatModel(BaseChatModel):
     def _llm_type(self) -> str:
         return "echo"
 
+    def bind_tools(self, tools: Sequence[Any], **kwargs: Any) -> BaseChatModel:
+        """Accept a tool binding without acting on it.
+
+        The default `BaseChatModel.bind_tools` raises `NotImplementedError`, and
+        DeepAgents binds unconditionally — it injects filesystem and subagent
+        tools even when the caller passes none. Without this, the zero-key path
+        cannot reach the model node at all, which would defeat Principle II.
+
+        Echo never emits tool calls: it returns text, the agent loop sees no
+        tool call, and the turn ends. That is the intended CI behaviour — we are
+        exercising the graph's plumbing, not its tool selection.
+        """
+        return self
+
     def _generate(
         self,
         messages: list[BaseMessage],

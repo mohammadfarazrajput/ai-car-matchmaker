@@ -62,7 +62,7 @@ Zero build cost, days of waiting. Start in parallel with Phase 1.
 - [x] T020 [P] SHIP Implement LLM providers in `backend/app/llm/providers.py` — `google`, `groq`, and a deterministic `echo` for CI
 - [x] T021 SHIP Implement `SessionState` and the LangGraph checkpointer in `backend/app/agent/state.py`, keyed on `session_id`
 - [x] T022 SHIP Scaffold FastAPI app in `backend/app/main.py` with CORS and `GET /health` reporting `llm_provider`, `listings_loaded` and per-channel live/mock
-- [ ] T023 SHIP Assemble the DeepAgents graph in `backend/app/agent/graph.py`
+- [x] T023 SHIP Assemble the DeepAgents graph in `backend/app/agent/graph.py`
 - [x] T024 SHIP Mount the AG-UI SSE endpoint at `POST /agent` in `backend/app/main.py`
 - [ ] T025 [P] SHIP Scaffold Next.js app with CopilotKit provider in `frontend/src/app/layout.tsx` and `page.tsx`
 

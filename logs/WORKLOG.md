@@ -269,3 +269,36 @@ booking refuses revision outright.
 Resume tokens: single-use, one hour, alphabet excluding I/O/0/1 since the codes get read aloud on the
 phone handoff. Rejections carry a *reason* (`unknown` / `used` / `expired`) so the route can explain
 and offer a fresh start rather than returning a bare 404.
+
+**Agent B — renderer type fix.** Removed `SelectComponent`/`DateFieldComponent` from `types.ts` (backend
+emits `ChoicePicker`/`DateTimeInput` per corrected A2UI catalog). Removed `Select`/`DateField` switch
+cases from `renderer.tsx`. Fixed all 9 type errors: bad casts (Icon→ImageComponent, Slider→ChoicePickerComponent,
+DateTimeInput→TextFieldComponent), implicit `any` in `resolveValue`, unknown-to-boolean coercion, unused import.
+Fixed `store.ts` `any` in `setByPath`. `tsc --noEmit`, `next build`, `eslint` all clean.
+→ commit `89f29dc`
+
+**T023 — DeepAgents graph.** `backend/app/agent/graph.py`, 12 new tests (57 total).
+
+`create_deep_agent(model, tools, system_prompt, state_schema, checkpointer)`; `CarMatchmakerState`
+extends `DeepAgentState` so the interview slots sit alongside `messages`. Slots live in agent state
+rather than a side store precisely so the model can see what it already captured — that is what makes
+FR-003 achievable instead of aspirational.
+
+**`EchoChatModel` needed `bind_tools`.** DeepAgents binds unconditionally — it injects filesystem and
+subagent tools even when the caller passes none — and the base class raises `NotImplementedError`.
+Without it the zero-key path could not reach the model node at all, defeating Principle II.
+
+**Ran the real agent for the first time (groq).** It infers SUV/truck from "weekend camping trips" and
+*confirms* rather than asking cold; captures intent, budget and date from a single message without
+re-asking. FR-003 and the inference behaviour both work.
+
+**Found a leak: it told a car buyer "I couldn't find any specific files."** DeepAgents' filesystem
+tools were the only tools it had. Added a prompt guard, which cut it from 3 turns to 1 — but a prompt
+is the wrong fix for a structural problem, so I tested the actual hypothesis: with a single stub
+`search_cars` tool present, **leaks dropped to zero** and the agent called the tool and used its
+result correctly. The chatter is an artifact of having no domain tool and resolves at T034. Guard
+kept as defence in depth.
+
+Considered swapping to plain `langchain.agents.create_agent` for a clean tool surface and rejected
+it: MC-003 requires a recognised harness and DeepAgents is named in the brief. Trading a graded
+requirement for a cosmetic fix would be a bad deal.
