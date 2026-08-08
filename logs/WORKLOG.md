@@ -250,3 +250,22 @@ time rather than surfacing in a demo. Guard verified to fire.
 
 This is the second time a NON-NEGOTIABLE principle was breached by assuming a protocol shape instead
 of fetching it. Both times the fix was to make the emitter enforce it.
+
+**T021 — session state and checkpointer.** `backend/app/agent/state.py`, 16 new tests (45 total).
+
+Two representations rather than one: `GraphState` (TypedDict — LangGraph merges channel updates, so
+it needs a mapping) and the validated Pydantic `Session` everything outside the graph reads.
+`to_session` / `from_session` convert. The graph state stays JSON-serialisable throughout, which is
+what lets the checkpointer swap backends later without touching callers.
+
+Verified FR-021 against a real compiled graph rather than asserting it: three separate `invoke`
+calls on one `thread_id` accumulate state, and a second session sees none of it.
+
+`record_slot` enforces FR-004 structurally — revising a slot clears `ranked` and returns the phase to
+RESEARCHING, because recommendations must never outlive the inputs that produced them. Re-affirming
+the same value is deliberately not a revision, so it does not trigger a wasteful re-rank. A confirmed
+booking refuses revision outright.
+
+Resume tokens: single-use, one hour, alphabet excluding I/O/0/1 since the codes get read aloud on the
+phone handoff. Rejections carry a *reason* (`unknown` / `used` / `expired`) so the route can explain
+and offer a fresh start rather than returning a bare 404.
