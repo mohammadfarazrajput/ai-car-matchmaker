@@ -45,7 +45,7 @@ export interface ColumnComponent extends ComponentBase {
   align?: "center" | "end" | "start" | "stretch";
 }
 
-export interfaceListComponent extends ComponentBase {
+export interface ListComponent extends ComponentBase {
   component: "List";
   children: string[] | { path: string; componentId: string };
   direction?: "vertical" | "horizontal";

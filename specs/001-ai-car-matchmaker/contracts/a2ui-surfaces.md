@@ -110,6 +110,17 @@ Start from the basic catalog:
 Register a custom `CarCard` **only** if basic components cannot express the results card. Every
 custom component is surface area that has to render correctly under time pressure.
 
+**The catalog defines exactly 18 components**: `AudioPlayer`, `Button`, `Card`, `CheckBox`,
+`ChoicePicker`, `Column`, `DateTimeInput`, `Divider`, `Icon`, `Image`, `List`, `Modal`, `Row`,
+`Slider`, `Tabs`, `Text`, `TextField`, `Video`. Emitting anything else while declaring this
+`catalogId` is a protocol violation — the renderer has no definition to render against.
+`emitter.CATALOG_COMPONENTS` enforces this at emission time.
+
+Two traps worth naming: a single-choice dropdown is `ChoicePicker` with
+`variant: "mutuallyExclusive"` and `options: [{label, value}]` — there is no `Select`. A date input
+is `DateTimeInput` with `enableDate: true` — there is no `DateField`. And `Slider.steps` is the
+**number of divisions**, not the increment.
+
 ---
 
 ## Non-web channels
@@ -128,3 +139,4 @@ Only web adapters subscribe to A2UI frames. See [channel-adapter.md](./channel-a
 - [ ] `progress` step counts equal the real search figures for the same run
 - [ ] `/results/{i}/breakdown/*` equals the `RankedResult.breakdown` for that listing
 - [ ] Stream is newline-delimited with no pretty-printing
+- [ ] Every emitted component name is one of the catalog's 18

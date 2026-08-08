@@ -229,3 +229,24 @@ that quietly stops using the real model is worse than one that refuses to start.
 
 The `echo` model does real regex slot extraction, so CI exercises the interview path without
 credentials. Its own test caught a gap: `\blease\b` did not match "leasing".
+
+**Frontend lockfile unblocked — and a Principle I violation found on my side.**
+
+`npm install` failed twice more after Agent B's TypeScript fix. Verified every pin against the npm
+registry the same way I did `requirements.txt`: `@eslint/js@10.8.0` does not exist (latest 10.0.1) —
+Agent B assumed it tracks ESLint's own version, but it versions independently. Corrected, installed,
+**lockfile committed: 732 packages**. Also fixed a one-character typo blocking the build
+(`export interfaceListComponent`). Both are boundary exceptions, declared to Agent B.
+
+**The real find: I invented `Select` and `DateField`.** Neither is in the A2UI basic catalog, which
+defines exactly 18 components — yet my surfaces declared that catalog's `catalogId`. A judge opening
+the network tab would have found surfaces referencing components with no definition. Corrected:
+`Select` → `ChoicePicker` (`variant: "mutuallyExclusive"`, `options: [{label, value}]`),
+`DateField` → `DateTimeInput` (`enableDate: true`). Also `Slider.steps` is the **number of
+divisions**, not the increment — my `step: 2500` was wrong on both name and semantics.
+
+Added `CATALOG_COMPONENTS` to the emitter so an invented component name now raises at emission
+time rather than surfacing in a demo. Guard verified to fire.
+
+This is the second time a NON-NEGOTIABLE principle was breached by assuming a protocol shape instead
+of fetching it. Both times the fix was to make the emitter enforce it.

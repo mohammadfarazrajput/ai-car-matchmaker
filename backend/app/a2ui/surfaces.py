@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.models.schemas import CATEGORIES
 from app.a2ui.emitter import (
     action,
     bind,
@@ -34,18 +35,20 @@ def interview_surface() -> list[dict[str, Any]]:
                 {"id": "heading", "component": "Text", "text": "Tell me what you're looking for"},
                 {
                     "id": "intent",
-                    "component": "Select",
+                    "component": "ChoicePicker",
                     "label": "Buying or renting?",
-                    "options": ["buy", "rent"],
+                    "variant": "mutuallyExclusive",
+                    "options": [{"label": "Buy", "value": "buy"},
+                                {"label": "Rent", "value": "rent"}],
                     "value": bind("/interview/intent"),
                     "action": action("setIntent"),
                 },
                 {
                     "id": "category",
-                    "component": "Select",
+                    "component": "ChoicePicker",
                     "label": "Type of vehicle",
-                    "options": ["sedan", "suv", "truck", "van", "coupe", "convertible",
-                                "hatchback", "wagon", "sports", "luxury", "electric", "hybrid"],
+                    "variant": "mutuallyExclusive",
+                    "options": [{"label": c.title(), "value": c} for c in CATEGORIES],
                     "value": bind("/interview/category"),
                     "action": action("setCategory"),
                 },
@@ -55,14 +58,18 @@ def interview_surface() -> list[dict[str, Any]]:
                     "label": "Budget ceiling",
                     "min": 5000,
                     "max": 150000,
-                    "step": 2500,
+                    # `steps` is the NUMBER OF DIVISIONS, not the increment.
+                    # (150000-5000)/2500 = 58 divisions of $2,500.
+                    "steps": 58,
                     "value": bind("/interview/budget/max"),
                     "action": action("setBudget"),
                 },
                 {
                     "id": "target_date",
-                    "component": "DateField",
+                    "component": "DateTimeInput",
                     "label": "When do you need it?",
+                    "enableDate": True,
+                    "enableTime": False,
                     "value": bind("/interview/target_date"),
                     "action": action("setTargetDate"),
                 },

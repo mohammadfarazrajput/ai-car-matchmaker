@@ -34,6 +34,18 @@ MESSAGE_KEYS: frozenset[str] = frozenset(
     {"createSurface", "updateComponents", "updateDataModel", "deleteSurface"}
 )
 
+CATALOG_COMPONENTS: frozenset[str] = frozenset({
+    "AudioPlayer", "Button", "Card", "CheckBox", "ChoicePicker", "Column",
+    "DateTimeInput", "Divider", "Icon", "Image", "List", "Modal", "Row",
+    "Slider", "Tabs", "Text", "TextField", "Video",
+})
+"""The 18 components defined by the A2UI basic catalog.
+
+Emitting a component absent from the catalog we declared in `createSurface` is a
+protocol violation — the renderer has no definition to render against. Enforced
+here because it is otherwise invisible until a judge opens the network tab.
+"""
+
 SurfaceId = Literal["interview", "progress", "results", "checkout_launcher"]
 
 
@@ -62,6 +74,12 @@ def update_components(surface_id: str, components: list[dict[str, Any]]) -> dict
             raise A2uiProtocolError(
                 f"component {c['id']!r} has a 'props' object — A2UI puts attributes at the "
                 "top level of the component. 'props' is the fabricated format."
+            )
+        if c["component"] not in CATALOG_COMPONENTS:
+            raise A2uiProtocolError(
+                f"component {c['id']!r} uses {c['component']!r}, which is not in the A2UI "
+                f"basic catalog. Valid: {sorted(CATALOG_COMPONENTS)}. "
+                "Inventing a component name means the renderer has no definition for it."
             )
     return _frame("updateComponents", {"surfaceId": surface_id, "components": components})
 
