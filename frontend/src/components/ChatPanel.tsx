@@ -4,6 +4,7 @@ import React, { useState, useRef, useCallback } from "react";
 import { useA2UI } from "@/lib/a2ui/a2ui-provider";
 import { SurfaceRenderer } from "@/lib/a2ui/renderer";
 import { consumeAGUIStream, AGUIEvent } from "@/lib/a2ui/ag-ui-stream";
+import { NotificationPanel, Notification } from "./NotificationPanel";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -20,6 +21,7 @@ export function ChatPanel() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const sessionIdRef = useRef<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -99,6 +101,11 @@ export function ChatPanel() {
             return updated;
           });
           scrollToBottom();
+        },
+        onState: (state) => {
+          if (Array.isArray(state.notifications)) {
+            setNotifications(state.notifications);
+          }
         },
         onError: (err) => {
           setError(err);
@@ -184,6 +191,8 @@ export function ChatPanel() {
 
         <div ref={messagesEndRef} />
       </div>
+
+      <NotificationPanel notifications={notifications} />
 
       <div style={{ padding: "0.75rem 1rem", borderTop: "1px solid #e0e0e0", display: "flex", gap: "0.5rem" }}>
         <input
