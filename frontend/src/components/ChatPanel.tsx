@@ -5,8 +5,9 @@ import { useA2UI } from "@/lib/a2ui/a2ui-provider";
 import { SurfaceRenderer } from "@/lib/a2ui/renderer";
 import { consumeAGUIStream, AGUIEvent } from "@/lib/a2ui/ag-ui-stream";
 import { NotificationPanel, Notification } from "./NotificationPanel";
+import { Action } from "@/lib/a2ui/types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8010";
 
 interface ChatMessage {
   id: string;
@@ -28,6 +29,77 @@ export function ChatPanel() {
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
+
+  const dispatchAction = useCallback(async (action: Action) => {
+    if (!sessionIdRef.current) return;
+    setIsLoading(true);
+    setError(null);
+
+    const assistantMsg: ChatMessage = {
+      id: `a-${Date.now()}`,
+      role: "assistant",
+      surfaces: [],
+    };
+    setMessages((prev) => [...prev, assistantMsg]);
+
+    try {
+      const res = await fetch(`${API_URL}/agent`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          session_id: sessionIdRef.current,
+          action: { name: action.event.name, context: action.event.context ?? {} },
+        }),
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      let textBuffer = "";
+
+      await consumeAGUIStream(res, {
+        onEvent: (event: AGUIEvent) => {
+          if (event.sessionId) sessionIdRef.current = event.sessionId;
+        },
+        onText: (content: string) => {
+          textBuffer += content;
+          setMessages((prev) => {
+            const updated = [...prev];
+            const last = updated[updated.length - 1];
+            if (last && last.role === "assistant") {
+              updated[updated.length - 1] = { ...last, text: textBuffer };
+            }
+            return updated;
+          });
+          scrollToBottom();
+        },
+        onFrame: (frame) => {
+          applyFrame(frame);
+          setMessages((prev) => {
+            const updated = [...prev];
+            const last = updated[updated.length - 1];
+            if (last && last.role === "assistant") {
+              const surfaces = last.surfaces ?? [];
+              const surfaceId = frame.createSurface?.surfaceId ?? frame.updateComponents?.surfaceId;
+              if (surfaceId && !surfaces.includes(surfaceId)) {
+                updated[updated.length - 1] = { ...last, surfaces: [...surfaces, surfaceId] };
+              }
+            }
+            return updated;
+          });
+          scrollToBottom();
+        },
+        onState: (state) => {
+          if (Array.isArray(state.notifications)) setNotifications(state.notifications);
+        },
+        onError: (err) => setError(err),
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Action failed");
+    } finally {
+      setIsLoading(false);
+      scrollToBottom();
+    }
+  }, [applyFrame, scrollToBottom]);
 
   const sendMessage = useCallback(async () => {
     const text = input.trim();
@@ -166,7 +238,7 @@ export function ChatPanel() {
                   if (!surface) return null;
                   return (
                     <div key={surfaceId} style={{ marginTop: "0.5rem" }}>
-                      <SurfaceRenderer surface={surface} />
+                      <SurfaceRenderer surface={surface} onAction={dispatchAction} />
                     </div>
                   );
                 })}
