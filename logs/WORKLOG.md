@@ -204,3 +204,28 @@ immediately, confirming the free-tier limits Faraz raised. Pinned `gemini-3.5-fl
 `typescript >=4.8.4 <6.1.0`, but Agent B pinned `typescript@7.0.2`. No published typescript-eslint
 supports TS 7. Highest compatible TypeScript is **6.0.3**. Left the fix to Agent B — `frontend/` is
 theirs.
+
+**Agent B — fixes from Agent A's answers.** (1) TypeScript `7.0.2` → `6.0.3` to satisfy
+`typescript-eslint@8.66.0` peer dep. (2) Wired action dispatch: `ChatPanel.dispatchAction` sends
+`POST /agent` with `{ session_id, action: { name, context } }` — name/context verbatim from
+`action.event`, no interpretation. Actions now flow through the same SSE stream. (3) No SMS cleanup
+needed — `NotificationPanel` is channel-agnostic. Commit `108eaad`. Agent A to re-run `npm install`
+and commit the lockfile.
+
+**T020 — LLM providers.** Four: `google`, `vertex`, `groq`, `echo`. 29 tests green.
+
+Vertex added per Faraz's rate-limit challenge; `langchain-google-vertexai==3.2.4` verified to
+resolve against the existing set before being written in. It is never the committed default —
+an evaluator can paste an API key but cannot be asked to onboard to GCP (Principle II).
+
+**Cross-provider bug found by testing rather than reading**: `langchain-google-genai` 4.x returns
+`AIMessage.content` as a **list of content blocks**, while Groq returns a plain `str`. Any code
+calling `.strip()` or `json.loads()` on `.content` works with one provider and breaks with the
+other — and it would have surfaced only when switching to Google for the recorded demo. Added
+`message_text()`; every consumer of a model response must go through it.
+
+Providers refuse loudly on a missing credential rather than silently degrading to `echo` — a demo
+that quietly stops using the real model is worse than one that refuses to start.
+
+The `echo` model does real regex slot extraction, so CI exercises the interview path without
+credentials. Its own test caught a gap: `\blease\b` did not match "leasing".

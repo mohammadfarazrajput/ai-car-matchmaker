@@ -12,7 +12,7 @@ from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-LlmProvider = Literal["google", "groq", "echo"]
+LlmProvider = Literal["google", "vertex", "groq", "echo"]
 
 
 class Settings(BaseSettings):
@@ -29,6 +29,13 @@ class Settings(BaseSettings):
     google_model: str = "gemini-3.5-flash"
     groq_api_key: str = ""
     groq_model: str = "llama-3.3-70b-versatile"
+
+    # Vertex authenticates via ADC or a service-account JSON, never an API key.
+    # Real quota headroom, but it needs a GCP project + billing — too much to ask
+    # of an evaluator, so it is never the committed default.
+    vertex_project: str = ""
+    vertex_location: str = "us-central1"
+    vertex_model: str = "gemini-3.5-flash"
 
     # --- Notification channels ----------------------------------------------
     resend_api_key: str = ""

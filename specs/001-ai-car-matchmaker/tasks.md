@@ -59,7 +59,7 @@ Zero build cost, days of waiting. Start in parallel with Phase 1.
 - [x] T017 SHIP Write generator `backend/app/data/generate.py` producing ~180 listings with trim, EV, safety and TCO attributes, non-empty availability windows, and a `synthetic: true` manifest
 - [x] T018 SHIP Generate `backend/app/data/listings.json` and commit it
 - [x] T019 SHIP **Unit test: marketplace coverage invariant** in `backend/tests/unit/test_marketplace_coverage.py` — ≥100 listings, ≥12 categories, ≥10 distinct makes per category, every listing has an availability window, manifest declares synthetic
-- [ ] T020 [P] SHIP Implement LLM providers in `backend/app/llm/providers.py` — `google`, `groq`, and a deterministic `echo` for CI
+- [x] T020 [P] SHIP Implement LLM providers in `backend/app/llm/providers.py` — `google`, `groq`, and a deterministic `echo` for CI
 - [ ] T021 SHIP Implement `SessionState` and the LangGraph checkpointer in `backend/app/agent/state.py`, keyed on `session_id`
 - [x] T022 SHIP Scaffold FastAPI app in `backend/app/main.py` with CORS and `GET /health` reporting `llm_provider`, `listings_loaded` and per-channel live/mock
 - [ ] T023 SHIP Assemble the DeepAgents graph in `backend/app/agent/graph.py`

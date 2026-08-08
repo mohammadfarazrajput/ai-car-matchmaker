@@ -28,6 +28,7 @@ langgraph-checkpoint==4.2.0
 # AI Studio, NOT Vertex AI — different products. research.md R4.
 # Major version 4; the 2.x snippets in docs/ do not apply.
 langchain-google-genai==4.3.2
+langchain-google-vertexai==3.2.4
 langchain-groq==1.1.1
 
 # --- AG-UI transport ---------------------------------------------------------
