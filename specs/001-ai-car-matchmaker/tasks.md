@@ -39,14 +39,14 @@ Zero build cost, days of waiting. Start in parallel with Phase 1.
 ## Phase 1: Setup — Day 1 block 1
 
 - [x] T005 SHIP Create `backend/` tree per plan.md Structure Decision (`frontend/` left to T025 — opencode owns it)
-- [ ] T006 SHIP Write `backend/requirements.txt` with exact pins from research.md R9 — no ranges
+- [x] T006 SHIP Write `backend/requirements.txt` with exact pins from research.md R9 — no ranges
 - [ ] T007 SHIP Write `frontend/package.json` with exact pins; commit the lockfile
 - [ ] T008 [P] SHIP Configure ruff + black in `backend/pyproject.toml`
 - [ ] T009 [P] SHIP Configure ESLint + Prettier in `frontend/.eslintrc.json`
-- [ ] T010 SHIP Write `backend/app/config.py` — Pydantic settings, every integration key optional
+- [x] T010 SHIP Write `backend/app/config.py` — Pydantic settings, every integration key optional
 - [ ] T011 SHIP Write `docker-compose.yml` with backend and frontend services
 - [ ] T012 SHIP Add CI workflow in `.github/workflows/ci.yml` running pytest on `LLM_PROVIDER=echo`
-- [ ] T013 SHIP Verify `pip install -r backend/requirements.txt` resolves — Principle V gate
+- [x] T013 SHIP Verify `pip install -r backend/requirements.txt` resolves — Principle V gate
 
 ---
 
@@ -54,17 +54,17 @@ Zero build cost, days of waiting. Start in parallel with Phase 1.
 
 **⚠️ No user story work begins until this phase completes.**
 
-- [ ] T014 SHIP Define Pydantic entities in `backend/app/models/schemas.py` — `Listing`, `Price`, `Performance`, `EvSpec`, `Safety`, `TcoBreakdown`, `Provider`, `AvailabilityWindow` per data-model.md
-- [ ] T015 SHIP Define `Session`, `BudgetRange`, `Contact`, `ChannelStamp`, `RankedResult`, `ScoreBreakdown`, `Booking`, `Notification`, `ResumeToken` in `backend/app/models/schemas.py`
-- [ ] T016 SHIP Author `backend/app/data/brand_matrix.json` — 12 categories, ≥10 curated plausible manufacturers each
-- [ ] T017 SHIP Write generator `backend/app/data/generate.py` producing ~180 listings with trim, EV, safety and TCO attributes, non-empty availability windows, and a `synthetic: true` manifest
-- [ ] T018 SHIP Generate `backend/app/data/listings.json` and commit it
-- [ ] T019 SHIP **Unit test: marketplace coverage invariant** in `backend/tests/unit/test_marketplace_coverage.py` — ≥100 listings, ≥12 categories, ≥10 distinct makes per category, every listing has an availability window, manifest declares synthetic
+- [x] T014 SHIP Define Pydantic entities in `backend/app/models/schemas.py` — `Listing`, `Price`, `Performance`, `EvSpec`, `Safety`, `TcoBreakdown`, `Provider`, `AvailabilityWindow` per data-model.md
+- [x] T015 SHIP Define `Session`, `BudgetRange`, `Contact`, `ChannelStamp`, `RankedResult`, `ScoreBreakdown`, `Booking`, `Notification`, `ResumeToken` in `backend/app/models/schemas.py`
+- [x] T016 SHIP Author `backend/app/data/brand_matrix.json` — 12 categories, ≥10 curated plausible manufacturers each
+- [x] T017 SHIP Write generator `backend/app/data/generate.py` producing ~180 listings with trim, EV, safety and TCO attributes, non-empty availability windows, and a `synthetic: true` manifest
+- [x] T018 SHIP Generate `backend/app/data/listings.json` and commit it
+- [x] T019 SHIP **Unit test: marketplace coverage invariant** in `backend/tests/unit/test_marketplace_coverage.py` — ≥100 listings, ≥12 categories, ≥10 distinct makes per category, every listing has an availability window, manifest declares synthetic
 - [ ] T020 [P] SHIP Implement LLM providers in `backend/app/llm/providers.py` — `google`, `groq`, and a deterministic `echo` for CI
 - [ ] T021 SHIP Implement `SessionState` and the LangGraph checkpointer in `backend/app/agent/state.py`, keyed on `session_id`
-- [ ] T022 SHIP Scaffold FastAPI app in `backend/app/main.py` with CORS and `GET /health` reporting `llm_provider`, `listings_loaded` and per-channel live/mock
+- [x] T022 SHIP Scaffold FastAPI app in `backend/app/main.py` with CORS and `GET /health` reporting `llm_provider`, `listings_loaded` and per-channel live/mock
 - [ ] T023 SHIP Assemble the DeepAgents graph in `backend/app/agent/graph.py`
-- [ ] T024 SHIP Mount the AG-UI SSE endpoint at `POST /agent` in `backend/app/main.py`
+- [x] T024 SHIP Mount the AG-UI SSE endpoint at `POST /agent` in `backend/app/main.py`
 - [ ] T025 [P] SHIP Scaffold Next.js app with CopilotKit provider in `frontend/src/app/layout.tsx` and `page.tsx`
 
 **Checkpoint**: `docker compose up` serves both services; `/health` responds; CI green.
@@ -79,7 +79,7 @@ Zero build cost, days of waiting. Start in parallel with Phase 1.
 - [ ] T026 [US1] SHIP Implement slot-filling in `backend/app/agent/interview.py` — multi-slot extraction from a single message, never re-asking a filled slot (FR-003)
 - [ ] T027 [US1] SHIP Implement slot revision in `backend/app/agent/interview.py` — clears `ranked`, returns state to RESEARCHING (FR-004)
 - [ ] T028 [US1] SHIP Implement missing-slot reporting and explicit-assumption proceed in `backend/app/agent/interview.py` (FR-005, FR-006)
-- [ ] T029 [US1] SHIP Write the A2UI JSONL emitter in `backend/app/a2ui/emitter.py` — one object per line, `version` plus exactly one of the four keys, no pretty-printing
+- [x] T029 [US1] SHIP Write the A2UI JSONL emitter in `backend/app/a2ui/emitter.py` — one object per line, `version` plus exactly one of the four keys, no pretty-printing
 - [ ] T030 [US1] SHIP Build the `interview` surface in `backend/app/a2ui/surfaces.py` with data paths and actions per contracts/a2ui-surfaces.md §1
 - [ ] T031 [P] [US1] SHIP Write the A2UI catalog and renderers in `frontend/src/lib/a2ui/catalog.tsx`
 - [ ] T032 [P] [US1] SHIP Build `frontend/src/components/ChatPanel.tsx` wiring the AG-UI stream to the A2UI renderer

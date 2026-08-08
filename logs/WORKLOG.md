@@ -155,3 +155,21 @@ is enforced in code rather than in review.
 
 Stub data deliberately ranks a Tesla above the BMW. A stub that rehearsed a BMW-first result would
 set the wrong expectation for a ranker that is required to be brand-neutral.
+
+**T014–T019 (backend).** Pydantic entities, curated brand matrix, generator, dataset, coverage test.
+
+`schemas.py` makes the functional requirements executable rather than documentary — a listing that
+could not satisfy FR-008 now fails construction: EV spec present iff electrified, new cars at zero
+miles, availability windows ordered and non-overlapping. `ScorableListing` omits `make`, `model` and
+`provider.name` by construction, so Principle III is structural.
+
+`brand_matrix.json` is authored, not sampled. 12 categories x >=10 plausible manufacturers, with a
+model list per pair — random pairing from a flat brand pool yields a Lamborghini minivan.
+
+Generated **180 listings, 12 categories, >=10 makes each**, all validating. Pass 1 emits every
+(category, make) pair so FR-007 holds by construction; pass 2 tops up for volume.
+
+**Mutation-tested the coverage gate**: thinning `truck` to 3 makes correctly failed 3 of 12
+assertions. A gate that cannot fail is not a gate.
+
+Pydantic v2 rejects non-annotated class attributes — `WEIGHTS` and `CORE_SLOTS` needed `ClassVar`.

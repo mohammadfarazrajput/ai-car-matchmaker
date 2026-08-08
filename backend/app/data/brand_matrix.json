@@ -1,0 +1,86 @@
+{
+  "_comment": "Curated category -> manufacturer pairings. FR-007 requires >=10 distinct makes in every category, and every pair here is a vehicle that plausibly exists. Random sampling from a flat brand pool produces nonsense such as a Lamborghini minivan, which is why this is authored rather than generated.",
+  "_synthetic": true,
+  "categories": {
+    "sedan": ["Toyota", "Honda", "BMW", "Mercedes-Benz", "Audi", "Volkswagen", "Hyundai", "Kia", "Mazda", "Nissan", "Subaru", "Lexus"],
+    "suv": ["Toyota", "Honda", "BMW", "Mercedes-Benz", "Audi", "Volvo", "Hyundai", "Kia", "Mazda", "Ford", "Jeep", "Land Rover"],
+    "truck": ["Ford", "Chevrolet", "RAM", "Toyota", "GMC", "Nissan", "Honda", "Rivian", "Jeep", "Hyundai"],
+    "van": ["Chrysler", "Honda", "Toyota", "Kia", "Mercedes-Benz", "Ford", "Volkswagen", "Nissan", "RAM", "Hyundai"],
+    "coupe": ["BMW", "Mercedes-Benz", "Audi", "Ford", "Chevrolet", "Toyota", "Nissan", "Lexus", "Subaru", "Dodge"],
+    "convertible": ["Mazda", "BMW", "Mercedes-Benz", "Ford", "Chevrolet", "Audi", "Porsche", "Mini", "Jeep", "Volkswagen"],
+    "hatchback": ["Volkswagen", "Honda", "Toyota", "Mazda", "Hyundai", "Kia", "Mini", "Subaru", "Nissan", "Chevrolet"],
+    "wagon": ["Subaru", "Volvo", "Audi", "Mercedes-Benz", "BMW", "Volkswagen", "Toyota", "Porsche", "Mini", "Peugeot"],
+    "sports": ["Porsche", "Chevrolet", "Ford", "Nissan", "Toyota", "BMW", "Audi", "Mazda", "Lotus", "Dodge"],
+    "luxury": ["Mercedes-Benz", "BMW", "Audi", "Lexus", "Genesis", "Porsche", "Jaguar", "Land Rover", "Cadillac", "Volvo"],
+    "electric": ["Tesla", "BMW", "Hyundai", "Kia", "Ford", "Volkswagen", "Polestar", "Rivian", "Mercedes-Benz", "Nissan"],
+    "hybrid": ["Toyota", "Honda", "Hyundai", "Kia", "Lexus", "Ford", "BMW", "Volvo", "Subaru", "Chrysler"]
+  },
+  "models": {
+    "sedan": {
+      "Toyota": ["Camry", "Corolla"], "Honda": ["Accord", "Civic"], "BMW": ["330i", "530i"],
+      "Mercedes-Benz": ["C 300", "E 350"], "Audi": ["A4", "A6"], "Volkswagen": ["Jetta", "Passat"],
+      "Hyundai": ["Sonata", "Elantra"], "Kia": ["K5", "Forte"], "Mazda": ["Mazda3 Sedan"],
+      "Nissan": ["Altima", "Sentra"], "Subaru": ["Legacy"], "Lexus": ["ES 350", "IS 300"]
+    },
+    "suv": {
+      "Toyota": ["RAV4", "Highlander"], "Honda": ["CR-V", "Pilot"], "BMW": ["X3", "X5"],
+      "Mercedes-Benz": ["GLC 300", "GLE 350"], "Audi": ["Q5", "Q7"], "Volvo": ["XC60", "XC90"],
+      "Hyundai": ["Tucson", "Santa Fe"], "Kia": ["Sportage", "Telluride"], "Mazda": ["CX-5", "CX-90"],
+      "Ford": ["Explorer", "Escape"], "Jeep": ["Grand Cherokee", "Wrangler"], "Land Rover": ["Discovery Sport"]
+    },
+    "truck": {
+      "Ford": ["F-150", "Ranger"], "Chevrolet": ["Silverado 1500", "Colorado"], "RAM": ["1500", "2500"],
+      "Toyota": ["Tacoma", "Tundra"], "GMC": ["Sierra 1500", "Canyon"], "Nissan": ["Frontier", "Titan"],
+      "Honda": ["Ridgeline"], "Rivian": ["R1T"], "Jeep": ["Gladiator"], "Hyundai": ["Santa Cruz"]
+    },
+    "van": {
+      "Chrysler": ["Pacifica"], "Honda": ["Odyssey"], "Toyota": ["Sienna"], "Kia": ["Carnival"],
+      "Mercedes-Benz": ["Sprinter", "Metris"], "Ford": ["Transit", "Transit Connect"],
+      "Volkswagen": ["ID. Buzz"], "Nissan": ["NV200"], "RAM": ["ProMaster"], "Hyundai": ["Staria"]
+    },
+    "coupe": {
+      "BMW": ["M240i", "430i"], "Mercedes-Benz": ["CLE 300"], "Audi": ["A5 Coupe"],
+      "Ford": ["Mustang GT"], "Chevrolet": ["Camaro LT"], "Toyota": ["GR86"],
+      "Nissan": ["Z"], "Lexus": ["RC 350"], "Subaru": ["BRZ"], "Dodge": ["Challenger R/T"]
+    },
+    "convertible": {
+      "Mazda": ["MX-5 Miata"], "BMW": ["430i Convertible", "Z4"], "Mercedes-Benz": ["CLE Cabriolet"],
+      "Ford": ["Mustang Convertible"], "Chevrolet": ["Corvette Stingray Convertible"],
+      "Audi": ["A5 Cabriolet"], "Porsche": ["718 Boxster"], "Mini": ["Cooper S Convertible"],
+      "Jeep": ["Wrangler Unlimited"], "Volkswagen": ["T-Roc Cabriolet"]
+    },
+    "hatchback": {
+      "Volkswagen": ["Golf GTI", "Golf R"], "Honda": ["Civic Hatchback"], "Toyota": ["Corolla Hatchback"],
+      "Mazda": ["Mazda3 Hatchback"], "Hyundai": ["Elantra N"], "Kia": ["Rio 5-Door"],
+      "Mini": ["Cooper S"], "Subaru": ["Impreza"], "Nissan": ["Versa Note"], "Chevrolet": ["Bolt EUV"]
+    },
+    "wagon": {
+      "Subaru": ["Outback", "Crosstrek"], "Volvo": ["V60", "V90 Cross Country"],
+      "Audi": ["A4 Allroad", "A6 Allroad"], "Mercedes-Benz": ["E 450 All-Terrain"],
+      "BMW": ["3 Series Touring"], "Volkswagen": ["Golf Alltrack"], "Toyota": ["Corolla Touring"],
+      "Porsche": ["Panamera Sport Turismo"], "Mini": ["Clubman"], "Peugeot": ["508 SW"]
+    },
+    "sports": {
+      "Porsche": ["911 Carrera", "718 Cayman"], "Chevrolet": ["Corvette Stingray"],
+      "Ford": ["Mustang Dark Horse"], "Nissan": ["Z Performance"], "Toyota": ["GR Supra"],
+      "BMW": ["M2", "M4"], "Audi": ["TT RS"], "Mazda": ["MX-5 RF"], "Lotus": ["Emira"], "Dodge": ["Challenger SRT"]
+    },
+    "luxury": {
+      "Mercedes-Benz": ["S 500", "EQS 450+"], "BMW": ["740i", "i7"], "Audi": ["A8 L"],
+      "Lexus": ["LS 500"], "Genesis": ["G90", "GV80"], "Porsche": ["Panamera"],
+      "Jaguar": ["F-PACE"], "Land Rover": ["Range Rover Sport"], "Cadillac": ["Escalade"], "Volvo": ["XC90 Recharge"]
+    },
+    "electric": {
+      "Tesla": ["Model 3 Long Range", "Model Y Long Range"], "BMW": ["i4 eDrive40", "iX xDrive50"],
+      "Hyundai": ["IONIQ 5 SEL", "IONIQ 6"], "Kia": ["EV6 Wind", "EV9 Land"],
+      "Ford": ["Mustang Mach-E", "F-150 Lightning"], "Volkswagen": ["ID.4 Pro"],
+      "Polestar": ["Polestar 2"], "Rivian": ["R1S"], "Mercedes-Benz": ["EQE 350+"], "Nissan": ["Ariya"]
+    },
+    "hybrid": {
+      "Toyota": ["Prius", "RAV4 Hybrid"], "Honda": ["Accord Hybrid", "CR-V Hybrid"],
+      "Hyundai": ["Tucson Hybrid"], "Kia": ["Sorento Hybrid"], "Lexus": ["RX 350h"],
+      "Ford": ["Escape Hybrid"], "BMW": ["330e"], "Volvo": ["S60 Recharge"],
+      "Subaru": ["Crosstrek Hybrid"], "Chrysler": ["Pacifica Hybrid"]
+    }
+  }
+}
