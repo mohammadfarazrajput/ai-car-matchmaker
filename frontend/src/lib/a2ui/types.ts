@@ -1,6 +1,7 @@
 export const A2UI_VERSION = "1.0" as const;
 
-export type DynamicValue = string | number | boolean | { path: string } | { call: string; args: Record<string, unknown> };
+export type DynamicValue =
+  string | number | boolean | { path: string } | { call: string; args: Record<string, unknown> };
 
 export interface Action {
   event: { name: string; context?: Record<string, unknown> };
@@ -79,21 +80,6 @@ export interface TextFieldComponent extends ComponentBase {
   action?: Action;
 }
 
-export interface SelectComponent extends ComponentBase {
-  component: "Select";
-  label?: DynamicValue;
-  options: Array<string | { label: DynamicValue; value: string }>;
-  value: DynamicValue;
-  action?: Action;
-}
-
-export interface DateFieldComponent extends ComponentBase {
-  component: "DateField";
-  label?: DynamicValue;
-  value: DynamicValue;
-  action?: Action;
-}
-
 export interface ChoicePickerComponent extends ComponentBase {
   component: "ChoicePicker";
   label?: DynamicValue;
@@ -140,8 +126,6 @@ export type A2UIComponent =
   | CardComponent
   | ButtonComponent
   | TextFieldComponent
-  | SelectComponent
-  | DateFieldComponent
   | ChoicePickerComponent
   | SliderComponent
   | DateTimeInputComponent

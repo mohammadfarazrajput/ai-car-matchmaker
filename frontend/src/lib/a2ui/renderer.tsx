@@ -7,6 +7,7 @@ import {
   Action,
   TextComponent,
   ImageComponent,
+  IconComponent,
   RowComponent,
   ColumnComponent,
   ListComponent,
@@ -14,7 +15,8 @@ import {
   ButtonComponent,
   TextFieldComponent,
   ChoicePickerComponent,
-  DividerComponent,
+  SliderComponent,
+  DateTimeInputComponent,
 } from "./types";
 import { SurfaceState } from "./store";
 
@@ -24,10 +26,10 @@ function resolveValue(v: DynamicValue | undefined, dataModel: Record<string, unk
   if (typeof v === "number" || typeof v === "boolean") return String(v);
   if (typeof v === "object" && "path" in v) {
     const parts = (v as { path: string }).path.split("/").filter(Boolean);
-    let current: any = dataModel;
+    let current: unknown = dataModel;
     for (const p of parts) {
-      if (current == null) return "";
-      current = current[p];
+      if (current == null || typeof current !== "object") return "";
+      current = (current as Record<string, unknown>)[p];
     }
     return current != null ? String(current) : "";
   }
@@ -35,11 +37,8 @@ function resolveValue(v: DynamicValue | undefined, dataModel: Record<string, unk
     const fn = v as { call: string; args: Record<string, unknown> };
     if (fn.call === "formatString" && fn.args.value) {
       const template = resolveValue(fn.args.value as DynamicValue, dataModel);
-      return template.replace(/\$\{([^}]+)\}/g, (_match, expr: string) => {
+      return template.replace(/\$\{([^}]+)\}/g, (_match: string, expr: string) => {
         const trimmed = expr.trim();
-        if (trimmed.startsWith("/")) {
-          return resolveValue({ path: trimmed }, dataModel);
-        }
         return resolveValue({ path: trimmed }, dataModel);
       });
     }
@@ -91,8 +90,13 @@ function renderComponent(
     }
 
     case "Icon": {
-      const c = comp as ImageComponent;
-      return <span key={c.id} aria-label={String(c.name)}>●</span>;
+      const c = comp as IconComponent;
+      const name = typeof c.name === "string" ? c.name : "";
+      return (
+        <span key={c.id} aria-label={name}>
+          &#9679;
+        </span>
+      );
     }
 
     case "Row": {
@@ -112,7 +116,9 @@ function renderComponent(
           {childIds.map((childId) => {
             const childComp = surface.components.get(childId);
             return childComp ? (
-              <React.Fragment key={childId}>{renderComponent(childComp, surface, onAction)}</React.Fragment>
+              <React.Fragment key={childId}>
+                {renderComponent(childComp, surface, onAction)}
+              </React.Fragment>
             ) : null;
           })}
         </div>
@@ -136,7 +142,9 @@ function renderComponent(
           {childIds.map((childId) => {
             const childComp = surface.components.get(childId);
             return childComp ? (
-              <React.Fragment key={childId}>{renderComponent(childComp, surface, onAction)}</React.Fragment>
+              <React.Fragment key={childId}>
+                {renderComponent(childComp, surface, onAction)}
+              </React.Fragment>
             ) : null;
           })}
         </div>
@@ -146,10 +154,14 @@ function renderComponent(
     case "List": {
       const c = comp as ListComponent;
       const isHorizontal = c.direction === "horizontal";
-
       const childIds = resolveChildren(c.children, dataModel);
 
-      if (childIds.length === 0 && c.children && typeof c.children === "object" && "path" in c.children) {
+      if (
+        childIds.length === 0 &&
+        c.children &&
+        typeof c.children === "object" &&
+        "path" in c.children
+      ) {
         const items = resolveValue({ path: c.children.path }, dataModel);
         try {
           const arr = JSON.parse(items);
@@ -174,8 +186,10 @@ function renderComponent(
                       fontSize: "0.85rem",
                     }}
                   >
-                    {item.label && <div style={{ fontWeight: 500 }}>{String(item.label)}</div>}
-                    {item.detail && <div style={{ color: "#666", fontSize: "0.8rem" }}>{String(item.detail)}</div>}
+                    {!!item.label && <div style={{ fontWeight: 500 }}>{String(item.label)}</div>}
+                    {!!item.detail && (
+                      <div style={{ color: "#666", fontSize: "0.8rem" }}>{String(item.detail)}</div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -199,7 +213,9 @@ function renderComponent(
           {childIds.map((childId) => {
             const childComp = surface.components.get(childId);
             return childComp ? (
-              <React.Fragment key={childId}>{renderComponent(childComp, surface, onAction)}</React.Fragment>
+              <React.Fragment key={childId}>
+                {renderComponent(childComp, surface, onAction)}
+              </React.Fragment>
             ) : null;
           })}
         </div>
@@ -229,12 +245,26 @@ function renderComponent(
             }}
           >
             {imageUrl && (
-              <img src={imageUrl} alt={title} style={{ width: "100%", height: 160, objectFit: "cover" }} />
+              <img
+                src={imageUrl}
+                alt={title}
+                style={{ width: "100%", height: 160, objectFit: "cover" }}
+              />
             )}
             <div style={{ padding: "0.75rem" }}>
-              {title && <div style={{ fontWeight: 600, fontSize: "0.95rem", marginBottom: "0.25rem" }}>{title}</div>}
-              {subtitle && <div style={{ fontSize: "0.8rem", color: "#666", marginBottom: "0.5rem" }}>{subtitle}</div>}
-              {body && <div style={{ fontSize: "0.85rem", color: "#444", lineHeight: 1.5 }}>{body}</div>}
+              {title && (
+                <div style={{ fontWeight: 600, fontSize: "0.95rem", marginBottom: "0.25rem" }}>
+                  {title}
+                </div>
+              )}
+              {subtitle && (
+                <div style={{ fontSize: "0.8rem", color: "#666", marginBottom: "0.5rem" }}>
+                  {subtitle}
+                </div>
+              )}
+              {body && (
+                <div style={{ fontSize: "0.85rem", color: "#444", lineHeight: 1.5 }}>{body}</div>
+              )}
             </div>
           </div>
         );
@@ -274,7 +304,12 @@ function renderComponent(
             padding: "0.5rem 1rem",
             borderRadius: 6,
             border: c.variant === "primary" ? "none" : "1px solid #ccc",
-            background: c.variant === "primary" ? "#1a1a1a" : c.variant === "borderless" ? "transparent" : "#f5f5f5",
+            background:
+              c.variant === "primary"
+                ? "#1a1a1a"
+                : c.variant === "borderless"
+                  ? "transparent"
+                  : "#f5f5f5",
             color: c.variant === "primary" ? "#fff" : "#1a1a1a",
             cursor: "pointer",
             fontWeight: c.variant === "primary" ? 600 : 400,
@@ -289,9 +324,13 @@ function renderComponent(
       const c = comp as TextFieldComponent;
       return (
         <div key={c.id} style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-          <label style={{ fontSize: "0.85rem", fontWeight: 500 }}>{resolveValue(c.label, dataModel)}</label>
+          <label style={{ fontSize: "0.85rem", fontWeight: 500 }}>
+            {resolveValue(c.label, dataModel)}
+          </label>
           <input
-            type={c.variant === "number" ? "number" : c.variant === "obscured" ? "password" : "text"}
+            type={
+              c.variant === "number" ? "number" : c.variant === "obscured" ? "password" : "text"
+            }
             placeholder={resolveValue(c.placeholder, dataModel)}
             defaultValue={resolveValue(c.value, dataModel)}
             style={{
@@ -309,7 +348,11 @@ function renderComponent(
       const c = comp as ChoicePickerComponent;
       return (
         <div key={c.id} style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-          {c.label && <label style={{ fontSize: "0.85rem", fontWeight: 500 }}>{resolveValue(c.label, dataModel)}</label>}
+          {c.label && (
+            <label style={{ fontSize: "0.85rem", fontWeight: 500 }}>
+              {resolveValue(c.label, dataModel)}
+            </label>
+          )}
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
             {c.options.map((opt) => (
               <button
@@ -333,57 +376,36 @@ function renderComponent(
     }
 
     case "Slider": {
-      const c = comp as ChoicePickerComponent;
+      const c = comp as SliderComponent;
       return (
         <div key={c.id} style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-          {c.label && <label style={{ fontSize: "0.85rem", fontWeight: 500 }}>{resolveValue(c.label, dataModel)}</label>}
-          <input type="range" style={{ width: "100%" }} />
+          {c.label && (
+            <label style={{ fontSize: "0.85rem", fontWeight: 500 }}>
+              {resolveValue(c.label, dataModel)}
+            </label>
+          )}
+          <input
+            type="range"
+            min={c.min ?? 0}
+            max={c.max}
+            step={c.steps}
+            style={{ width: "100%" }}
+          />
         </div>
       );
     }
 
     case "DateTimeInput": {
-      const c = comp as TextFieldComponent;
+      const c = comp as DateTimeInputComponent;
       return (
         <div key={c.id} style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-          {c.label && <label style={{ fontSize: "0.85rem", fontWeight: 500 }}>{resolveValue(c.label, dataModel)}</label>}
-          <input type="date" style={{ padding: "0.5rem", borderRadius: 4, border: "1px solid #ccc" }} />
-        </div>
-      );
-    }
-
-    case "Select": {
-      const c = comp as SelectComponent;
-      const currentValue = resolveValue(c.value, dataModel);
-      return (
-        <div key={c.id} style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-          {c.label && <label style={{ fontSize: "0.85rem", fontWeight: 500 }}>{resolveValue(c.label, dataModel)}</label>}
-          <select
-            defaultValue={currentValue}
-            onChange={() => c.action && onAction?.(c.action)}
-            style={{ padding: "0.5rem", borderRadius: 4, border: "1px solid #ccc", fontSize: "0.9rem" }}
-          >
-            <option value="">Select…</option>
-            {c.options.map((opt) => {
-              const val = typeof opt === "string" ? opt : opt.value;
-              const lbl = typeof opt === "string" ? opt : resolveValue(opt.label, dataModel);
-              return <option key={val} value={val}>{lbl}</option>;
-            })}
-          </select>
-        </div>
-      );
-    }
-
-    case "DateField": {
-      const c = comp as DateFieldComponent;
-      const currentValue = resolveValue(c.value, dataModel);
-      return (
-        <div key={c.id} style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-          {c.label && <label style={{ fontSize: "0.85rem", fontWeight: 500 }}>{resolveValue(c.label, dataModel)}</label>}
+          {c.label && (
+            <label style={{ fontSize: "0.85rem", fontWeight: 500 }}>
+              {resolveValue(c.label, dataModel)}
+            </label>
+          )}
           <input
-            type="date"
-            defaultValue={currentValue}
-            onChange={() => c.action && onAction?.(c.action)}
+            type={c.enableDate !== false ? "date" : "time"}
             style={{ padding: "0.5rem", borderRadius: 4, border: "1px solid #ccc" }}
           />
         </div>
@@ -391,7 +413,12 @@ function renderComponent(
     }
 
     case "Divider": {
-      return <hr key={comp.id} style={{ border: "none", borderTop: "1px solid #e0e0e0", margin: "0.5rem 0" }} />;
+      return (
+        <hr
+          key={comp.id}
+          style={{ border: "none", borderTop: "1px solid #e0e0e0", margin: "0.5rem 0" }}
+        />
+      );
     }
 
     default:

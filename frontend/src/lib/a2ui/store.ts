@@ -80,13 +80,13 @@ export class A2UIStore {
 
   private setByPath(obj: Record<string, unknown>, path: string, value: unknown) {
     const parts = path.split("/").filter(Boolean);
-    let current: any = obj;
+    let current: Record<string, unknown> = obj;
     for (let i = 0; i < parts.length - 1; i++) {
       const key = parts[i];
       if (current[key] === undefined || current[key] === null) {
         current[key] = {};
       }
-      current = current[key];
+      current = current[key] as Record<string, unknown>;
     }
     current[parts[parts.length - 1]] = value;
   }
