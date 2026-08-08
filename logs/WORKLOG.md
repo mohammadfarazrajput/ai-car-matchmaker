@@ -156,6 +156,15 @@ is enforced in code rather than in review.
 Stub data deliberately ranks a Tesla above the BMW. A stub that rehearsed a BMW-first result would
 set the wrong expectation for a ranker that is required to be brand-neutral.
 
+**Agent B — renderer compatibility fix.** Backend stub uses `Select`, `DateField`, and a richer
+`Card` pattern (title/subtitle/imageUrl/body props) than the basic catalog spec. Updated
+`types.ts` with `SelectComponent` and `DateFieldComponent`, updated `CardComponent` to accept both
+`child` ref and direct content props, updated `ButtonComponent` with `label` prop, and updated
+`List` renderer to handle `items` path (array of objects). Updated `next.config.ts` API port default
+to 8010. Removed dead `CopilotKitProvider.tsx`, wired `NotificationPanel` into `ChatPanel` via
+`STATE_SNAPSHOT` notifications. Verified backend SSE stream: 61 valid A2UI frames, interview +
+progress + results surfaces all render correctly. Commits `f13bd1d`, `abd5ce8`.
+
 **T014–T019 (backend).** Pydantic entities, curated brand matrix, generator, dataset, coverage test.
 
 `schemas.py` makes the functional requirements executable rather than documentary — a listing that
