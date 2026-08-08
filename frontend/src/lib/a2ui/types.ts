@@ -54,12 +54,18 @@ export interfaceListComponent extends ComponentBase {
 
 export interface CardComponent extends ComponentBase {
   component: "Card";
-  child: string;
+  child?: string;
+  title?: DynamicValue;
+  subtitle?: DynamicValue;
+  imageUrl?: DynamicValue;
+  body?: DynamicValue;
+  action?: Action;
 }
 
 export interface ButtonComponent extends ComponentBase {
   component: "Button";
-  child: string;
+  child?: string;
+  label?: DynamicValue;
   variant?: "default" | "primary" | "borderless";
   action?: Action;
 }
@@ -70,6 +76,21 @@ export interface TextFieldComponent extends ComponentBase {
   value?: DynamicValue;
   placeholder?: DynamicValue;
   variant?: "longText" | "number" | "shortText" | "obscured";
+  action?: Action;
+}
+
+export interface SelectComponent extends ComponentBase {
+  component: "Select";
+  label?: DynamicValue;
+  options: Array<string | { label: DynamicValue; value: string }>;
+  value: DynamicValue;
+  action?: Action;
+}
+
+export interface DateFieldComponent extends ComponentBase {
+  component: "DateField";
+  label?: DynamicValue;
+  value: DynamicValue;
   action?: Action;
 }
 
@@ -119,6 +140,8 @@ export type A2UIComponent =
   | CardComponent
   | ButtonComponent
   | TextFieldComponent
+  | SelectComponent
+  | DateFieldComponent
   | ChoicePickerComponent
   | SliderComponent
   | DateTimeInputComponent
