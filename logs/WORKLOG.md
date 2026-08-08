@@ -182,3 +182,25 @@ Generated **180 listings, 12 categories, >=10 makes each**, all validating. Pass
 assertions. A gate that cannot fail is not a gate.
 
 Pydantic v2 rejects non-annotated class attributes — `WEIGHTS` and `CORE_SLOTS` needed `ClassVar`.
+
+**Answered Agent B; dropped SMS; wired real LLM keys.**
+
+*Action dispatch (contract gap Agent B found).* `contracts/agent-api.md` never said how A2UI actions
+return to the agent. Now defined: `POST /agent` with `{session_id, action:{name, context}}` — the
+same endpoint, because actions are conversational turns and `setBudget` must be able to trigger a
+re-rank and stream frames back. Implemented in the stub; verified that filling the fourth slot
+auto-runs research → progress → results (56 frames), and that an unknown action returns `RUN_ERROR`
+rather than failing quietly.
+
+*SMS dropped* per Faraz — decision #25. Removed from requirements, config, schemas, contracts,
+tasks (T001, T094 deleted), `.env.example` and `/health`.
+
+*LLM keys.* Both provided keys work. Two findings: **`gemini-2.5-flash` is 404 "no longer available
+to new users"** — the model named across every planning document — and `gemini-2.0-flash` 429s
+immediately, confirming the free-tier limits Faraz raised. Pinned `gemini-3.5-flash`, dev default
+`groq`.
+
+*Frontend lockfile blocked.* `npm install` fails: `typescript-eslint@8.66.0` peers
+`typescript >=4.8.4 <6.1.0`, but Agent B pinned `typescript@7.0.2`. No published typescript-eslint
+supports TS 7. Highest compatible TypeScript is **6.0.3**. Left the fix to Agent B — `frontend/` is
+theirs.

@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     # --- LLM -----------------------------------------------------------------
     llm_provider: LlmProvider = "echo"
     google_api_key: str = ""
-    google_model: str = "gemini-2.5-flash"
+    google_model: str = "gemini-3.5-flash"
     groq_api_key: str = ""
     groq_model: str = "llama-3.3-70b-versatile"
 
@@ -37,11 +37,6 @@ class Settings(BaseSettings):
     slack_bot_token: str = ""
     slack_channel: str = "#sales-leads"
     slack_lead_threshold: float = 0.90
-
-    twilio_sid: str = ""
-    twilio_auth_token: str = ""
-    twilio_phone_number: str = ""
-    twilio_demo_allowlist: str = ""  # comma-separated; SMS refuses anything outside it
 
     # --- Observability (STRETCH) --------------------------------------------
     observability_provider: Literal["phoenix", "langfuse", "none"] = "none"
@@ -56,10 +51,6 @@ class Settings(BaseSettings):
 
     # --- Derived -------------------------------------------------------------
 
-    @property
-    def sms_allowlist(self) -> list[str]:
-        return [n.strip() for n in self.twilio_demo_allowlist.split(",") if n.strip()]
-
     def channel_modes(self) -> dict[str, str]:
         """Live-vs-mock per channel, surfaced by /health.
 
@@ -68,7 +59,6 @@ class Settings(BaseSettings):
         return {
             "email": "live" if self.resend_api_key else "mock",
             "slack": "live" if self.slack_bot_token else "mock",
-            "sms": "live" if self.twilio_sid and self.twilio_auth_token else "mock",
         }
 
 

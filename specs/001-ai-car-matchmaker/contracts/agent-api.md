@@ -23,6 +23,44 @@ and returns it in the first event.
 **Errors**: LLM failure emits `RUN_ERROR` with a human-readable message and leaves session state
 untouched, so the person can retry without losing captured inputs.
 
+### A2UI action dispatch
+
+An A2UI surface returns interactions to the agent through **the same endpoint**, not a side channel.
+A2UI actions are conversational turns — `setBudget` must be able to trigger a re-rank and stream new
+frames back — so they ride the agent loop rather than a REST mutation.
+
+**Request** — send `action` instead of (or alongside) `messages`:
+
+```json
+{ "session_id": "…",
+  "action": { "name": "setBudget", "context": { "value": 65000 } } }
+```
+
+`name` and `context` are taken verbatim from the component's `action.event`. The frontend adds
+nothing and interprets nothing.
+
+**Response**: the same SSE stream. The agent applies the action, then emits whatever follows —
+typically `updateDataModel` frames confirming the slot, and once the interview completes, the
+`progress` and `results` surfaces.
+
+| Action | Context | Effect |
+|---|---|---|
+| `setIntent` | `{value: "buy"\|"rent"}` | Fills the intent slot |
+| `setCategory` | `{value: "<category>"}` | Fills the category slot |
+| `setBudget` | `{value: <number>}` | Fills budget max |
+| `setTargetDate` | `{value: "YYYY-MM-DD"}` | Fills the target date |
+| `proceedAnyway` | `{assumption: "<text>"}` | Research with a slot missing (FR-006) |
+| `selectCar` | `{index: <n>}` \| `{listingId: "…"}` | Selects, opens `checkout_launcher` |
+| `openBookingForm` | `{listingId: "…"}` | Hands off to the booking MCP App |
+| `explainMore` | `{index: <n>}` | Expands the reasoning for one result |
+| `refineSearch` | `{…}` | Re-runs research with adjusted inputs |
+
+**Unknown action names** return `RUN_ERROR` rather than failing silently — a typo in a surface
+definition must be loud.
+
+`value` is the conventional single-payload key. Components carrying their own bound value send it
+under `value`; anything richer uses named context fields.
+
 ---
 
 ## `GET /api/listings` — marketplace read

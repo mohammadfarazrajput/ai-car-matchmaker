@@ -29,7 +29,6 @@ explicitly requested and back graded requirements.
 
 Zero build cost, days of waiting. Start in parallel with Phase 1.
 
-- [ ] T001 [P] SHIP Submit Twilio toll-free verification (longest lead; blocks all SMS work)
 - [ ] T002 [P] SHIP Create Slack app, grant `chat:write`, invite bot, record token in `.env`
 - [ ] T003 [P] SHIP Sign up Resend, record `RESEND_API_KEY` in `.env`
 - [ ] T004 [P] SHIP Obtain Google AI Studio key, record `GOOGLE_API_KEY` in `.env`
@@ -210,7 +209,6 @@ Strict order. Stop when time runs out.
 - [ ] T091 STRETCH [US7] Wire Arize Phoenix and `openinference-instrumentation-langchain` in `backend/app/observability/tracing.py`
 - [ ] T092 STRETCH [US7] Verify a completed session's decision path is reconstructable from its trace alone (SC-011)
 - [ ] T093 [US1] STRETCH Implement browser voice capture and playback in `frontend/src/components/VoiceInput.tsx` with Deepgram STT/TTS, push-to-talk, barge-in, and commit-on-final only
-- [ ] T094 [US5] STRETCH Implement the Twilio SMS adapter in `backend/app/channels/sms.py` with allowlist enforcement, rate limiting and `STOP` handling — **requires T001 to have returned**
 - [ ] T095 STRETCH [US7] Build the eval set in `backend/tests/eval/` — ~20 scripted interviews asserting slot extraction, LLM-judged explanation quality
 
 ---
@@ -222,6 +220,7 @@ No implementation tasks. Presented as architecture in the deck; must never be de
 - Inbound phone interview concierge (claudedocs/03 §3a)
 - Outbound follow-up call and warm transfer (claudedocs/03 §3b)
 - Slack `/match-status` and `/override-match` slash commands (claudedocs/06 §4)
+- SMS — dropped 2026-08-08; A2P 10DLC needs a paid account and 10–15 days of review, and the free toll-free path caps at 5 pre-designated numbers
 - WhatsApp — dropped, multi-day Meta Business Verification
 
 ---
@@ -237,7 +236,7 @@ Phase 1 Setup                    │
           ├─► Phase 4 US2 ───┤   │   ← CHECKPOINT D1
           ├─► Phase 5 US3 ───┤   │   ← CHECKPOINT D2-MID
           ├─► Phase 6 US4 ───┤   │
-          ├─► Phase 7 US5 ◄──────┘   (T094 also needs T001)
+          ├─► Phase 7 US5 ◄──────┘
           └─► Phase 8 US6 ───┤
                              ▼
                     Phase 9 Ship ──► Phase 10 Polish
@@ -254,7 +253,7 @@ nothing.
 
 ## Parallel opportunities
 
-- **Phase 0**: T001–T004 all at once, and alongside Phase 1
+- **Phase 0**: T002–T004 all at once, and alongside Phase 1
 - **Phase 1**: T008, T009 together
 - **Phase 2**: T020 and T025 alongside T014–T019
 - **Phase 3**: T031, T032 (frontend) alongside T026–T030 (backend)

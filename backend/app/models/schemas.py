@@ -29,7 +29,7 @@ Condition = Literal["new", "used"]
 Intent = Literal["buy", "rent"]
 Arrangement = Literal["finance", "lease", "outright"]
 NotifyEvent = Literal["ranking_ready", "booking_confirmed", "session_abandoned"]
-ChannelName = Literal["email", "slack", "sms"]
+ChannelName = Literal["email", "slack"]
 DeliveryStatus = Literal["sent", "failed", "mock"]
 BookingStatus = Literal["draft", "confirmed", "cancelled"]
 

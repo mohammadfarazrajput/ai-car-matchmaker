@@ -42,8 +42,8 @@ async def notify(session: Session,
 | Event | Email | Slack | SMS | Fires when |
 |---|---|---|---|---|
 | `ranking_ready` | dossier | alert if top score > 0.90 | — | Ranking completes |
-| `booking_confirmed` | receipt | deal alert | confirmation | `confirm_payment` returns |
-| `session_abandoned` | — | — | resume link | 5 min idle at checkout *(STRETCH)* |
+| `booking_confirmed` | receipt | deal alert | — | `confirm_payment` returns |
+| `session_abandoned` | resume link | — | — | 5 min idle at checkout *(STRETCH)* |
 
 ### Rules
 
@@ -96,17 +96,15 @@ button that appears functional but silently does nothing is worse than no button
 Bot token over incoming webhook: same cost today, and it keeps the DESIGNED slash-command tier
 reachable.
 
-### `sms` — STRETCH
+### `sms` — DROPPED (2026-08-08)
 
-Twilio. `TWILIO_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER`, `TWILIO_DEMO_ALLOWLIST`.
+Removed from scope. A2P 10DLC registration requires a paid Twilio account, $44 + $15 per campaign,
+and 10–15 days of review — impossible inside the build window at any price. The free toll-free path
+caps at 5 pre-designated numbers, which is demo-scale rather than a real channel.
 
-**Hard constraint**: trial accounts cannot register A2P 10DLC — it needs a paid account, $44 + $15
-per campaign, and 10–15 days of review. The free path is toll-free verification to ≤5 pre-designated
-numbers. SMS is therefore a demo-scale channel and is documented as such.
+Presented as a designed extension. No adapter is implemented and no task exists, so it cannot drift
+into being demonstrated.
 
-Guard rails: refuse any recipient outside `TWILIO_DEMO_ALLOWLIST` — fail loudly in development rather
-than silently on stage. Rate limit per session. Templates ≤160 characters including the link, since
-segmentation doubles cost and mangles previews. Handle `STOP`.
 
 ---
 
@@ -118,5 +116,4 @@ segmentation doubles cost and mangles previews. Handle `STOP`.
 - [ ] No credentials → `status: "mock"` with `rendered` populated
 - [ ] Rendered figures equal `RankedResult.breakdown` for the same session
 - [ ] Receipt content contains the simulated-transaction banner
-- [ ] SMS refuses a recipient outside the allowlist
 - [ ] `booking_confirmed` completes even when every adapter fails

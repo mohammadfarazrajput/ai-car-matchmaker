@@ -18,7 +18,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from app.a2ui import surfaces
-from app.a2ui.emitter import to_jsonl
+from app.a2ui.emitter import to_jsonl, update_data_model
 from app.config import settings
 from app.stub_data import STUB_LISTINGS, STUB_PROGRESS_STEPS, listing_detail, projection
 
@@ -58,9 +58,95 @@ class Message(BaseModel):
     content: str
 
 
+class A2uiAction(BaseModel):
+    """Verbatim from a component's `action.event`. The frontend interprets nothing."""
+
+    name: str
+    context: dict[str, Any] = {}
+
+
 class AgentRequest(BaseModel):
     session_id: str | None = None
     messages: list[Message] = []
+    action: A2uiAction | None = None
+
+
+# Stub session store. Replaced by the LangGraph checkpointer at T021.
+_SESSIONS: dict[str, dict[str, Any]] = {}
+
+_SLOT_FOR_ACTION = {
+    "setIntent": "intent",
+    "setCategory": "category",
+    "setBudget": "budget",
+    "setTargetDate": "target_date",
+}
+CORE_SLOTS = ("intent", "category", "budget", "target_date")
+
+
+def _session(session_id: str) -> dict[str, Any]:
+    return _SESSIONS.setdefault(
+        session_id, {"intent": None, "category": None, "budget": None,
+                     "target_date": None, "selected_car_id": None},
+    )
+
+
+async def _apply_action(session_id: str, act: A2uiAction) -> AsyncIterator[str]:
+    """Apply an A2UI action and stream the consequences."""
+    state = _session(session_id)
+
+    if act.name in _SLOT_FOR_ACTION:
+        slot = _SLOT_FOR_ACTION[act.name]
+        state[slot] = act.context.get("value")
+        path = "/interview/budget/max" if slot == "budget" else f"/interview/{slot}"
+        yield a2ui_event(update_data_model("interview", path, state[slot]))
+        missing = [s for s in CORE_SLOTS if state[s] is None]
+        yield a2ui_event(update_data_model("interview", "/interview/missing", missing))
+        yield sse("STATE_SNAPSHOT", state={"session_id": session_id, **state, "missing": missing})
+
+        if not missing:
+            async for chunk in _research_and_rank():
+                yield chunk
+        return
+
+    if act.name == "proceedAnyway":
+        async for chunk in _research_and_rank():
+            yield chunk
+        return
+
+    if act.name in ("selectCar", "openBookingForm"):
+        idx = act.context.get("index", 0)
+        listing_id = act.context.get("listingId") or STUB_LISTINGS[idx]["id"]
+        state["selected_car_id"] = listing_id
+        detail = listing_detail(listing_id) or STUB_LISTINGS[0]
+        headline = f"{detail['year']} {detail['make']} {detail['model']}"
+        for frame in surfaces.checkout_launcher_surface(listing_id, headline):
+            yield a2ui_event(frame)
+        yield sse("STATE_SNAPSHOT", state={"session_id": session_id, **state})
+        return
+
+    if act.name in ("explainMore", "refineSearch"):
+        yield sse("TEXT_MESSAGE_START", message_id="m-act")
+        yield sse("TEXT_MESSAGE_CONTENT", message_id="m-act",
+                  delta=f"[stub] {act.name} acknowledged; the real agent answers this at T040.")
+        yield sse("TEXT_MESSAGE_END", message_id="m-act")
+        return
+
+    # A typo in a surface definition must be loud, not silent.
+    yield sse("RUN_ERROR", message=f"unknown action {act.name!r}")
+
+
+async def _research_and_rank() -> AsyncIterator[str]:
+    for frame in surfaces.progress_surface():
+        yield a2ui_event(frame)
+    steps: list[dict[str, str]] = []
+    for step in STUB_PROGRESS_STEPS:
+        steps.append(step)
+        yield a2ui_event(surfaces.progress_step(list(steps)))
+        await asyncio.sleep(0.25)
+    ranked = [projection(l, i) for i, l in enumerate(STUB_LISTINGS)]
+    for frame in surfaces.results_surface(ranked):
+        yield a2ui_event(frame)
+        await asyncio.sleep(0.03)
 
 
 async def _stub_run(session_id: str) -> AsyncIterator[str]:
@@ -100,11 +186,19 @@ async def _stub_run(session_id: str) -> AsyncIterator[str]:
     yield sse("RUN_FINISHED", session_id=session_id)
 
 
+async def _action_run(session_id: str, act: A2uiAction) -> AsyncIterator[str]:
+    yield sse("RUN_STARTED", session_id=session_id)
+    async for chunk in _apply_action(session_id, act):
+        yield chunk
+    yield sse("RUN_FINISHED", session_id=session_id)
+
+
 @app.post("/agent")
 async def agent(req: AgentRequest) -> StreamingResponse:
     session_id = req.session_id or "stub-session-1"
+    stream = _action_run(session_id, req.action) if req.action else _stub_run(session_id)
     return StreamingResponse(
-        _stub_run(session_id),
+        stream,
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
